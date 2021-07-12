@@ -85,16 +85,22 @@
 ### Build는 3단계로 되어있다
 
 1. 초기화(Initialization)
+
    1. 빌드 대상 프로젝트를 결정, 각각에 대한 Project 생성. 
    2. settings.gradle 파일에서 프로젝트 구성 (멀티프로젝트, 싱글프로젝트 구분)
+
 2. 구성(Configuration)
+
    1. 빌드 대상이 되는 모든 프로젝트의 빌드 스크립트 실행 (프로젝트 객체 구성)
    2. configured Task실행
+
 3. 실행(Excution)
+
    1. 구성 단계에서 생성하고 설정된 프로젝트의 Task 중에 실행 대상 결정
+
    2. gradle 명령행에서 지정한 Task 이름 인자와 현재 디렉토리를 기반으로 Task 결정해서 선택된 Task들을 실행
 
-
+      
 
 ## 라이브러리 의존성 관리
 
