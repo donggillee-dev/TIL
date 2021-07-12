@@ -1,4 +1,4 @@
-## 스붓 속성강의
+# 스붓 속성강의
 
 - 제일 기초!! SpringBootApplication 얘만 있으면 일단 application생성 완료
 
@@ -8,7 +8,7 @@
 
 
 
-### 주요 어노테이션
+## 주요 어노테이션
 
 - @EnableAspectJAutoProxy
 
