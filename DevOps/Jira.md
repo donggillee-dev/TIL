@@ -2,7 +2,7 @@
 
 
 
-* [Jira 란?](#Jira란?)
+* [Jira 란?](#Jira란)
 
 
 
