@@ -39,7 +39,10 @@
 
 - peer간의 직접 연결을 막는 등의 라우터의 제한을 결정하는 프로토콜
   - 현재 다른 peer가 접근 가능한지 여부 결정
+  
 - 클라는 인터넷을 통해 클라의 Public Address와 라우터의 NAT 뒤에 있는 클라가 접근 가능한지에 대한 답변을 STUN서버에 요청
+
+  ![STUN Server](https://user-images.githubusercontent.com/41468004/126253431-2735b62a-8954-4ed8-a29f-bdae0c65208d.png)
 
 
 
@@ -64,8 +67,12 @@
 ### TURN 서버
 
 - **TURN 서버와 연결, 모든 정보를 그 서버에 전달**하여 **Symmetric NAT 제한을 우회**하는 것을 의미
+
 - **TURN 서버와 연결**한 후 **모든 peer들에게 저 서버에게 모든 패킷을 보내고 다시 나(TURN서버)에게 전달**
+
 - 명백히 오버헤드가 발생하기에 다른 대안이 없을떄 사용해야함
+
+  [![TURN Server](https://user-images.githubusercontent.com/41468004/126253493-d19be8ef-e51e-4be5-882b-d5a395e67361.png)](#https://user-images.githubusercontent.com/41468004/126253493-d19be8ef-e51e-4be5-882b-d5a395e67361.png)
 
 
 
