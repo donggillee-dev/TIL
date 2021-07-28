@@ -77,13 +77,15 @@ Gradle 기반으로 작성
 
 ```groovy
 dependencies {
-    implementation 'org.mapstruct:mapstruct:1.3.1.Final'
-    annotationProcessor "org.mapstruct:mapstruct-processor:1.3.1.Final"
-
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    // lombok과 같이 사용할 때는 mapstruct annotationProcessor를
-    // 반드시 lombok보다 일찍 선언해야됩니다!
+    //Lombok 1.18.16 이상의 버전 사용시에는 lombok-mapstruct-binding 주입  필요
+  	//아래와같이 implementation 작성해주면 annotation쪽은 순서 상관 없다
+    implementation("org.mapstruct:mapstruct:1.3.1.Final")
+    implementation("org.projectlombok:lombok:1.18.20")
+    implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+  
+    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.3.1.Final")
+    annotationProcessor("org.projectlombok:lombok:1.18.20")
 }
 ```
 
