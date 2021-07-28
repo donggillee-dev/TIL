@@ -239,9 +239,7 @@ class OrderDto {
 }
 ```
 
-
-
-DTO에는 id 필드가 없고 img필드가 존재
+<u>DTO에는 id 필드가 없고 img필드가 존재</u>
 
 
 
@@ -259,11 +257,13 @@ DTO에는 id 필드가 없고 img필드가 존재
 
 변환해서 **저장하고자 하는 객체(target)**에는 `Builder` 혹은 `Setter`가 있어야 한다
 
-여기서는 **Builder** 를 이용해보자
+
+
+<u>여기서는 **Builder** 를 이용해보자</u>
 
 
 
-##### OrderMapper
+### OrderMapper
 
 ```java
 package com.huisam.springstudy.mapstruct;
@@ -286,6 +286,6 @@ public interface OrderMapper {
 
 
 
-##### 호출 방법
+### 호출 방법
 
 ![페이지네이션 포함 호출방법](https://user-images.githubusercontent.com/41468004/127270201-ea71a777-342d-4732-a7a4-a2efcd5d9d21.png)
