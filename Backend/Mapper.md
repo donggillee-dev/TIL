@@ -304,3 +304,246 @@ public interface NoticeListMapper {
 ### 호출 방법
 
 ![페이지네이션 포함 호출방법](https://user-images.githubusercontent.com/41468004/127270201-ea71a777-342d-4732-a7a4-a2efcd5d9d21.png)
+
+
+
+
+
+## JPA 순환참조 오류
+
+- 오류 상황
+
+  #### Notice Entity
+
+  ```java
+  package com.teamgu.database.entity;
+  
+  import java.util.ArrayList;
+  import java.util.Date;
+  import java.util.List;
+  
+  import javax.persistence.Column;
+  import javax.persistence.Entity;
+  import javax.persistence.FetchType;
+  import javax.persistence.JoinColumn;
+  import javax.persistence.ManyToOne;
+  import javax.persistence.OneToMany;
+  
+  import lombok.Getter;
+  import lombok.Setter;
+  @Entity
+  @Getter
+  @Setter
+  public class Notice extends BaseEntity {
+  
+  	Date createDate;
+  	Date mdifyDate;
+  	@Column(length = 80)
+  	String title;
+  	@Column(length = 2000)
+  	String content;
+  	
+  	@ManyToOne(fetch = FetchType.LAZY)
+  	@JoinColumn(name= "writer_id")
+  	private User user;
+  	
+  
+  	@OneToMany(mappedBy="notice")
+  	private List<NoticeFile> noticeFiles = new ArrayList<>();
+  	
+  }
+  ```
+
+  
+
+  #### NoticeFile Entity
+
+  ```java
+  package com.teamgu.database.entity;
+  
+  import java.sql.Date;
+  
+  import javax.persistence.Column;
+  import javax.persistence.Entity;
+  import javax.persistence.FetchType;
+  import javax.persistence.ManyToOne;
+  
+  import lombok.Getter;
+  import lombok.Setter;
+  
+  @Entity
+  @Getter
+  @Setter
+  public class NoticeFile extends BaseEntity {
+  	
+  	@Column(length = 120)
+  	String originalName;
+  	@Column(length = 45)
+  	String name;
+  	@Column(length = 45)
+  	String extension;
+  	Date registDate;
+  	
+  	@ManyToOne(fetch = FetchType.LAZY)
+  	private Notice notice;
+  }
+  
+  ```
+
+  우선 Notice와 NoticeFile은 1 : N 관계이다
+  특정 게시물에 대해서 가져올때 Dto를 NoticeDetailDto를 선언하여 반환하게끔 함
+
+  
+
+  ### 계속 순환참조가 일어나길래 이유를 조사해봄
+
+  - 양방향 참조가 문제가 된다
+  - 응답에 양방향 참조가 되어있는 Entity를 보내면 JsonSerializer가 toString()을 호출하는 시 property를 매핑하는 과정에서 무한 참조가 일어남
+  - 해결방법은
+    - **<u>DTO</u>**를 사용하여 엔티티 리턴 x
+    - `@JsonIgnore`, `@JsonManagedReference`, `@JsonBackReference` 이 세가지 이용
+      - **@JsonIgnore** : 이 어노테이션 붙이면 json 데이터에 해당 프로퍼티는 null로 들어가짐, 즉 데이터에 아예 포함안됨 ( 참조를 막아버림 )
+      - **@JsonManagedReference** : 부모 클래스에 붙이면 되는 어노테이션
+      - **@JsonBackReference** : 자식 클래스측에 붙이면 되는 어노테이션
+    - Entity 매핑 관계 재설정
+
+  
+
+  ### DTO 사용하는 방법 채택
+
+  - 이 방법으로 해도 순환참조 오류가 나길래 멘붕,,,
+
+  - 알고보니 너무 멍청했던 짓 => Notice는 DTO로 잘 변환해주고 그 안에 있는 NoticeFile은 매핑을 안해줬던것
+    최종적으로 완성된 코드는 아래와 같다
+
+    #### NoticeDetailResDto
+
+    ```java
+    package com.teamgu.api.dto.res;
+    
+    import io.swagger.annotations.ApiModel;
+    import io.swagger.annotations.ApiModelProperty;
+    import lombok.Getter;
+    import lombok.Setter;
+    
+    import java.util.ArrayList;
+    import java.util.Date;
+    import java.util.List;
+    
+    @Getter
+    @Setter
+    @ApiModel("NoticeDetailResponse")
+    public class NoticeDetailResDto extends BaseResDto {
+        @ApiModelProperty(name = "공지사항 생성일", example = "")
+        Date createDate;
+    
+        @ApiModelProperty(name = "공지사항 수정일", example = "")
+        Date mdfyDate;
+    
+        @ApiModelProperty(name = "공지사항 제목", example = "")
+        String title;
+    
+        @ApiModelProperty(name = "공지사항 내용", example = "")
+        String content;
+    
+        @ApiModelProperty(name = "공지사항 첨부파일 목록", example = "")
+        private List<NoticeFileResDto> noticeFiles = new ArrayList<>();
+    }
+    
+    ```
+
+    
+
+    #### NoticeFileResDto
+
+    ```java
+    package com.teamgu.api.dto.res;
+    
+    import io.swagger.annotations.ApiModel;
+    import io.swagger.annotations.ApiModelProperty;
+    import lombok.Getter;
+    import lombok.Setter;
+    
+    @Getter
+    @Setter
+    @ApiModel("NoticeFileResponse")
+    public class NoticeFileResDto extends BaseResDto {
+        @ApiModelProperty(name = "파일 원본명", example = "")
+        String originalName;
+    
+        @ApiModelProperty(name = "암호화된 파일명", example = "")
+        String name;
+    
+        @ApiModelProperty(name = "파일 화장자", example = "")
+        String extension;
+    
+        @ApiModelProperty(name = "파일 등록일", example = "")
+        String date;
+    }
+    
+    ```
+
+    
+
+    #### NoticeDetailMapper
+
+    ```java
+    package com.teamgu.mapper;
+    
+    import com.teamgu.api.dto.res.NoticeDetailResDto;
+    import com.teamgu.database.entity.Notice;
+    import org.mapstruct.Mapper;
+    import org.mapstruct.factory.Mappers;
+    
+    @Mapper(uses = NoticeFileMapper.class)
+    public interface NoticeDetailMapper {
+        NoticeDetailMapper INSTANCE = Mappers.getMapper(NoticeDetailMapper.class);
+    
+        NoticeDetailResDto noticeToDto(Notice notice);
+    }
+    
+    ```
+
+    
+
+    #### NoticeFileMapper
+
+    ```java
+    package com.teamgu.mapper;
+    
+    import com.teamgu.api.dto.res.NoticeFileResDto;
+    import com.teamgu.database.entity.NoticeFile;
+    import org.mapstruct.Mapper;
+    import org.mapstruct.Mapping;
+    import org.mapstruct.Named;
+    import org.mapstruct.factory.Mappers;
+    
+    import java.text.ParseException;
+    import java.text.SimpleDateFormat;
+    import java.util.Date;
+    
+    @Mapper
+    public interface NoticeFileMapper {
+        NoticeDetailMapper INSTANCE = Mappers.getMapper(NoticeDetailMapper.class);
+    
+        @Mapping(source = "registDate", target = "date", dateFormat = "yyyy.mm.dd")
+        NoticeFileResDto noticeFileToDto(NoticeFile noticeFile);
+    
+        @Mapping(source = "date", target = "registDate", qualifiedByName = "stringToDate")
+        NoticeFile dtoToNoticeFile(NoticeFileResDto noticeFileResDto);
+    
+        @Named("stringToDate")
+        static Date asDate(String date) {
+            try {
+                return date != null ? new SimpleDateFormat(" yyyy.mm.dd")
+                        .parse(date) : null;
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+    
+        }
+    }
+    
+    ```
+
+    
