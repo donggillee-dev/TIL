@@ -286,4 +286,6 @@ public interface OrderMapper {
 
 
 
-##### 호출 방법![image-20210728144424222](/Users/giri/Library/Application Support/typora-user-images/image-20210728144424222.png)
+##### 호출 방법
+
+![페이지네이션 포함 호출방법](https://user-images.githubusercontent.com/41468004/127270201-ea71a777-342d-4732-a7a4-a2efcd5d9d21.png)
