@@ -526,6 +526,7 @@ public interface NoticeListMapper {
     public interface NoticeFileMapper {
         NoticeDetailMapper INSTANCE = Mappers.getMapper(NoticeDetailMapper.class);
     
+      	@Mapping(target = "statusCode", ignore = true) //매핑 무시하고싶은 속성에 대해 처리
         @Mapping(source = "registDate", target = "date", dateFormat = "yyyy.mm.dd")
         NoticeFileResDto noticeFileToDto(NoticeFile noticeFile);
     
