@@ -178,4 +178,3 @@
 - Random Access 불가능
 - FIFO -> 먼저 들어간 원소가 가장 먼저 나옴
 - Java Collection에서 Queue는 인터페이스임, 이걸 구현한 Priority Queue나 , LinkedList로 해서 사용 가능
-- 
