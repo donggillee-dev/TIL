@@ -1,10 +1,24 @@
 # Data Structure
 
 * [Data Structure?](#data-structure?)
-* [Array vs LinkedList](#array-vs-linkedlist)
-* [ArrayList vs LinkedList][#arraylist-vs-linkedlist]
-* [Stack vs Queue](#stack-vs-queue)
-* [Tree](#tree)
+* [Sequential Access & Random Access](#sequential-access-&-random-access)
+* [ArrayList][#arraylist]
+* [LinkedList](#linkedlist)
+* [ArrayList vs LinkedList](#arraylist-vs-linkedlist)
+
+- [Stack](#stack)
+- [Queue](#queue)
+- [Tree](#tree)
+
+- [Binary Tree](#binary-tree)
+
+- [Binary Search Tree](#binary-search-tree)
+- [Heap](#heap)
+- [Trie](#trie)
+- [RBT](#rbt)
+- [Graph](#graph)
+
+- [Hash](#hash)
 
 
 
@@ -170,7 +184,7 @@
 
 > 계층적 관계를 표현하는 비선형 자료구조
 
-![](https://camo.githubusercontent.com/78163ac30efb3626bee26e7269938859caec33b6def337ff7657046122bb78ff/68747470733a2f2f7777772e6765656b73666f726765656b732e6f72672f77702d636f6e74656e742f75706c6f6164732f62696e6172792d747265652d746f2d444c4c2e706e67)
+![](https://user-images.githubusercontent.com/55429912/120596118-4eafce80-c47e-11eb-9f0c-5bc33705f0d0.png)
 
 - 사이클이 없는 그래프의 한 종류(사이클이 존재한다면 그래프)
 - 루트 노드에서 한 노드로 가는 경로는 유일한 경로 뿐
@@ -218,6 +232,8 @@
 
 > 루트 노드를 중심으로 두 개의 서브 트리로 나뉘어 지는 형태이며, 두 서브 트리도 Binary Tree 형태이어야함
 
+![](https://camo.githubusercontent.com/78163ac30efb3626bee26e7269938859caec33b6def337ff7657046122bb78ff/68747470733a2f2f7777772e6765656b73666f726765656b732e6f72672f77702d636f6e74656e742f75706c6f6164732f62696e6172792d747265652d746f2d444c4c2e706e67)
+
 - 공집합도 Binary Tree에 포함된다
 - 각 층별로 숫자를 매기는데 이를 `level`이라고 하며 0부터 시작 (root -> 0), 최고 레벨을 가리켜 `height` 라고 한다
 
@@ -242,6 +258,8 @@
 > Binary Search + LinkedList
 >
 > 효율적인 탐색과 저장을 위한 자료구조
+
+![](https://user-images.githubusercontent.com/55429912/120593467-86b51280-c47a-11eb-97ec-06dc0179e148.png)
 
 Binary Search
 
@@ -301,6 +319,8 @@ public void inorder(Node p) {
 >
 > 우선순위 큐를 위한 자료구조라고도 한다
 
+![](https://user-images.githubusercontent.com/55429912/120530590-aa477100-c418-11eb-9da6-d12bcd873b58.png)
+
 검색 : O(1)
 
 삽입 : O(log N)
@@ -321,7 +341,7 @@ public void inorder(Node p) {
 
 **삽입**
 
-1. 새로운 요소가 들어오면 힙 크기++, 마지막 요소에 삽입
+1. 새로운 요소가 들어오면 (힙 크기)++, 마지막 요소에 삽입
 2. 새로운 마지막 노드를 부모와 계속 비교해가며 swap
 
 
@@ -329,8 +349,145 @@ public void inorder(Node p) {
 **삭제**
 
 1. 최대/최소는 루트이기에 루트 삭제
-2. 맨 마지막 원소를 루트로 올림, 힙 크기--
+2. 맨 마지막 원소를 루트로 올림, (힙 크기)--
 3. 자식과 비교해가며 swap
    1. 왼쪽 자식, 오른쪽 자식보다 크거나 작다면 end
    2. 왼쪽 노드가 오른쪽 노드보다 크거나 작다면 왼쪽과 swap
    3. 오른쪽 노드가 왼쪽 노드보다 크거나 작다면 오른쪽과 swap
+
+
+
+## Trie
+
+> 문자열에서 검색을 빠르게 도와주는 자료구조
+
+![](https://camo.githubusercontent.com/7024b55e64516062054e9b5bccf35dc72d5e7a4cca88c8f57810804b955cb849/68747470733a2f2f74312e6461756d63646e2e6e65742f6366696c652f746973746f72792f323433353445333335383333413743463137)
+
+```
+정수형에서 이진탐색트리를 이용하면 시간복잡도 O(log)
+하지만 문자열에 적용하면 문자열 최대길이가 L일때 O(L * logN)
+
+트라이를 이용하게 된다면 → O(M)으로 문자열 검색이 가능
+```
+
+**시간 복잡도**
+
+제일 긴 문자열의 길이 : L
+
+문자열의 개수 : N
+
+- 생성시 시간 복잡도 : O(N * L)
+  - 모든 문자열들을 넣어야하므로 `N`개에 대해 트라이 자료구조에 넣는건 가장 긴 문자열 `L`만큼 걸리므로 `O(N * L)`
+- 탐색 : O(L)
+  - 트리를 최대 깊이까지 들어간다고 하더라도 가장 긴 문자열의 길이만큼만 탐색하면 되므로 O(L)
+
+
+
+## RBT
+
+![](https://user-images.githubusercontent.com/55429912/120613287-0d74ea00-c491-11eb-8df0-0a6fb437aaff.png)
+
+> 레드 블랙트리라고 불린다
+>
+> 자가 균형 BST로써, 동일한 노드의 개수일 때, Depth를 최소화하여 시간 복잡도를 줄이는 트리 형식의 자료구조
+>
+> BST에서 편향 트리의 경우를 배제할 수 있음
+
+**RBT의 조건**
+
+1. 각 노드는 `Red `혹은` Black`의 색을 갖는다
+2. **Root Property** : 루트노드의 색깔은 `Black`이다
+3. **External Property** : 모든 **External Node**들은` Black`이다
+4. **Internal Property** : `Red`노드의 자식은 `Black`이다
+   - `No Double Red`(Red 노드가 연속으로 나올 수 없음)
+5. **Depth Property** : 모드 리프노드에서 **Black Depth**는 동일
+   - 리프노드에서 루트노드까지 가는 경로에서 만나는 `Black`노드의 개수는 동일
+
+
+
+**삽입**
+
+1. BST의 특성을 유지하며 삽입, 루트노드는 `Black`
+
+2. 삽입된 노드의 색깔은 `Red`로 지정
+
+   - Black Height를 최소로 하기 위함
+
+3. RBT의 조건에 맞도록 노드들 설정
+
+   ![](https://user-images.githubusercontent.com/55429912/121356383-bdec5d80-c96b-11eb-9462-c8bea12d4fc0.png)
+   - 연속된 Red 노드가 나오게 되었을시 부모의 사촌(w)의 색상에 따라 두 가지로 분기
+     - w가 Black인 경우 Restructuring
+     - w가 Red인 경우 Recoloring
+   - Restructuring
+     - **나(z)와 내 부모(v), 내 부모의 부모(Grand Parent)를 오름차순으로 정렬**
+     - **무조건 가운데 있는 값을 부모로 만들고 나머지 둘을 자식으로 만든다.**
+     - **올라간 가운데 있는 값을 검정(Black)으로 만들고 그 두자식들을 빨강(Red)로 만든다.** 
+     - Restructuring 자체는 O(1)에 끝남, 하지만 Restructuring자체가 Insertion 이후에 일어나므로 O(logN)
+   - Recoloring
+     - **현재 삽입된 나(z)의 부모(v)와 형제(w)를 Black으로 하고 Grand Parent는 Red로 한다**
+       - 이 경우 Grand Parent가 루트노드라면 Black으로 됨
+       - 하지만 서브트리의 경우 Grand Parent의 부모 색상을 생각해줘야하는데 Double Red의 경우에는 propagation 발생 => **최악의 경우 Root Node까지감, 그래도 O(logN)**
+
+   - 즉, RBT의 시간 복잡도는 O(log N)
+
+
+
+## Graph
+
+> 노드와 그 노드를 연결하는 간선을 하나로 모아 놓은 자료구조
+
+- 연결되어 있는 객체 간의 관계를 표현할 수 있는 자료구조
+- 네트워크 모델
+- 그래프는 순환 or 비순환
+- 그래프에는 방향, 무방향 존재
+
+
+
+**구현 방식**
+
+1. 인접 행렬(adjacent matrix)
+
+`정방 행렬을 사용하는 방법`
+
+공간 복잡도 : O(V ^ 2)
+
+그래프에 간선이 많이 존재한 밀접 그래프에서 사용
+
+장점:
+
+- 노드간의 연결 관계를 O(1)로 알 수 있음
+
+단점:
+
+- 어떤 노드에 인접한 노드들을 찾기 위해서는 모든 노드를 전부 순회
+- 그래프에 존재하는 모든 간선의 수를 순회하려면 O(V ^ 2) 소요
+  - 인접 행렬 전체를 탐색해야하기 때문
+
+
+
+2. 인접 리스트(adjacent list)
+
+`연결 리스트를 사용하는 방식`
+
+공간 복잡도 : O(V + E)
+
+- 간선의 개수에 비례하는 메모리만 차지
+- 그래프내에 간선이 적은 희소 그래프에서 사용
+
+장점:
+
+- 특정 노드의 인접한 노드들을 쉽게 찾을 수 있음
+- 그래프에 존재하는 모든 간선의 수를 O(V + E)만에 알 수 있음
+
+단점:
+
+- 특정 노드간의 연결 여부를 확인하기 위해서는 O(V)만큼 탐색해야함
+
+**그래프와 노드의 차이**
+
+![](https://user-images.githubusercontent.com/55429912/121016900-aaa88900-c7d7-11eb-97ae-1cb30aeddd29.png)
+
+
+
+## Hash
