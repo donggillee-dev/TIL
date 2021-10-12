@@ -487,3 +487,124 @@ public void inorder(Node p) {
 
 
 ## Hash
+
+> Key와 Value로 연관지어 저장하는 연관 배열 자료구조
+>
+> Hash에 대한 정리는 Java 8을 기준으로 한다
+
+
+
+- Key를 이용하여 Value 도출
+- 내부적으로 배열(버킷)을 사용하여 데이터를 저장
+- 해시함수를 이용하여 배열의 고유한 인덱스 생성
+- 인덱스를 통해 빠른 검색 속도를 가진다
+
+
+
+**구조**
+
+- Key
+  - 고유한 값
+  - 저장 공간의 효율성을 위해 Hash Function에 입력하여 추출되는 HashCode이다
+- Hash Funciton
+  - Key를 HashCode로 변환해주는 역할을 한다
+  - 임의의 길이를 가지는 데이터를 고정된 길이의 데이터(HashCode)로 매핑해주는 함수
+  - Conflict를 최소화하기 위해 이 함수를 잘 짜는 것이 중요, + 보조 Hash Function도 존재
+
+
+
+**장점**
+
+- 해싱된 키를 가지고 배열의 인덱스로 사용하기에 접근성이 빠르고 삽입, 삭제가 용이하다
+
+**단점**
+
+- HashTable이 추가로 필요하기에 공간 효율성이 떨어진다
+- 해시 함수에 대한 의존도가 높다
+
+
+
+**Conflict**
+
+- Hashing된 인덱스에 이미 다른 값이 존재하는 경우, 다른 저장위치를 찾아야하는 오버헤드가 발생
+
+
+
+**Resolve Conflict**
+
+- **Open Addressing (개방주소법)**
+
+  - Collision 발생시 다른 버킷에 해당 자료를 삽입하는 방식. 즉, 데이터를 저장할 위치를 탐색해야함
+
+  - Linear Probing : 순차적으로 비어있는 버킷 탐색
+
+  - Quadratic Probing : 2차 함수를 이용해 탐색
+
+  - Double hashing Probing : 하나의 해쉬 함수에서 충돌이 일어나면 2차 해쉬 함수를 이용해 새로이 할당. 위 두가지 방법보다 더 많은 연산량 요구
+
+  - **삭제 처리**
+
+    ![](https://user-images.githubusercontent.com/55429912/121356871-3e12c300-c96c-11eb-8b6d-26c98ca031e5.png)
+
+    ```
+    Hash함수가 % 10인 경우
+    Yuna에서 Collision 발생, 이후에 2번 index 삭제
+    key 11에 대해서 검색 수행 -> index 1부터 시작하지만 index 2가 사라져있기에 검색 진행 안됨
+    이를 위해 index 2를 삭제하고 그 위치에 Dummy node를 삽입
+    
+    Dummy Node는 실제 값을 가지지 않으며 다음 index를 연결해주는 역할을 한다
+    ```
+
+    
+
+- **Seperate Chaining (분리 연결법)**
+
+  - Collision 발생시 LinkedList or Tree를 이용해 해당 위치에 데이터 추가
+
+  - **LinkedList 방식**
+
+    - 각각의 버킷들을 LinkedList로 만들어 Collision 발생 시 해당 버킷의 list에 데이터를 추가
+    - LinkedList의 특징 그대로 삽입, 삭제가 용이, but 단점도 그대로. 작은 데이터 연결시에 LinkedList 자체의 오버헤드가 크다(header, pointer등 부가적인 것들)
+    - 지속적으로 테이블의 개수를 늘려야할 수도 있는 Open Address에 비해 테이블 확장 늦출 수 있음
+
+  - **Tree 방식(RBT)**
+
+    - 기본적인 알고리즘은 Seperate Chaining과 동일, LinkedList 대신에 RBT사용
+    - 다만 LinkedList를 사용할지 RBT를 사용할지는 key-value의 개수에 따라 정의. 데이터가 적으면 LinkedList가 Tree보다 용이하기때문
+    - 그 기준은 Key-value 개수 6개, 8개로 정의한다 => 7은 어디?
+      - 변경하는데 소요되는 비용을 줄이기 위함
+      - 6개였다가 7개로 늘어났는데 Tree로 바로 변경되고 7개였다가 6개로 줄어들었는데 바로 LinkedList로 변경된다면 꽤나 많은 리소스가 필요할듯
+      - 6 -> 7 : LinkedList 유지, 8 -> 7 : RBT 유지
+
+  - **삭제 처리**
+
+    - key에 대한 index가 가리키고 있는 LinkedList에서 해당 노드를 삭제
+
+    
+
+- **Open Addressing vs Seperate Chaining**
+
+  - 두 방식 모두 Worst Case O(M)
+
+  - Open Addressing은 연속된 공간에 데이터 저장하기에 Seperate Chaining보다 캐시 효율이 높음
+
+    - 즉, 데이터의 개수가 적다면 Open Addressing 추천
+    - 하지만 데이터의 개수가 많아지면 캐시 효율이 떨어짐
+
+  - Java에서 사용하는 방식은 Seperate Chaining 방식
+
+    - Open Addressing 방식은 삭제 처리가 매우 어려움. 그에 비해 Seperate Chaining 방식은 매우 용이
+
+    - 또한 Key-Value의 개수가 일정 수준 넘어서면 Open Addressing이 더 느림(버킷 밀도가 높아질수록 Collision 발생 가능성 상승)
+
+      
+
+- **해시 버킷 동적 확장**
+  - HashMap은 Key-Value의 개수가 일정 개수 이상이 되면 버킷의 크기를 두배로 늘림 => Collision 가능성 저하된다
+  - 보통 기본값이 16, 버킷이 확장될때마다 추가적인 오버헤드가 발생하므로 초기에 생성자의 인자로 크기를 지정해주어 재구성 안하게끔 해주는 것이 좋다
+  -  `(load factor * 현재 해시의 버킷 크기) >= 데이터의 개수`의 경우에 버킷의 확장이 일어나는데 이 `load factor는 0.75이다, 또는 HashMap 생성자에서 지정 가능
+
+
+
+- **해시의 성능 향상 방법?**
+  - 캐시를 이용하여 자주 hit하는 데이터를 더욱 빠르게 접근처리 가능
