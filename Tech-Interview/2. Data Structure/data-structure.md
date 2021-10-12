@@ -2,7 +2,7 @@
 
 * [Data Structure?](#data-structure?)
 * [Sequential Access & Random Access](#sequential-access-&-random-access)
-* [ArrayList][#arraylist]
+* [ArrayList](#arraylist)
 * [LinkedList](#linkedlist)
 * [ArrayList vs LinkedList](#arraylist-vs-linkedlist)
 
