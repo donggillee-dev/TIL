@@ -1,23 +1,19 @@
 # Data Structure
 
-* [Data Structure?](#data-structure?)
-* [Sequential Access & Random Access](#sequential-access-&-random-access)
-* [ArrayList](#arraylist)
-* [LinkedList](#linkedlist)
-* [ArrayList vs LinkedList](#arraylist-vs-linkedlist)
-
+- [Data Structure?](#data-structure?)
+- [Sequential Access & Random Access](#sequential-access-&-random-access)
+- [ArrayList](#arraylist)
+- [LinkedList](#linkedlist)
+- [ArrayList vs LinkedList](#arraylist-vs-linkedlist)
 - [Stack](#stack)
 - [Queue](#queue)
 - [Tree](#tree)
-
 - [Binary Tree](#binary-tree)
-
 - [Binary Search Tree](#binary-search-tree)
 - [Heap](#heap)
 - [Trie](#trie)
 - [RBT](#rbt)
 - [Graph](#graph)
-
 - [Hash](#hash)
 
 
