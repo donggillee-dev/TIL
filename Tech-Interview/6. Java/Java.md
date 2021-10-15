@@ -1,15 +1,18 @@
 # Java
 
 - [컴파일 과정](#컴파일-과정)
-
 - [JVM](#jvm)
-
 - [Java Garbage Collection](#java-garbage-collection)
-- [JRE, JDK](#jre,-jdk)
-
-- [JAR, WAR](#jar,-war)
-
 - [Java SE, EE](#java-se,-ee)
+- [JDK, JRE](#jdk,-jre)
+- [Java의 장단점](#java의-장단점)
+- [Java의 데이터](#java의-데이터)
+
+- [Call By Value & Call By Reference](#call-by-value-&-call-by-reference)
+
+- [String / new String](string-/-new-string)
+
+- [String, StringBuilder, StringBuffer](#string,-stringbuilder,-stringbuffer)
 
 
 
@@ -39,6 +42,12 @@
    2. JIT(Just-In-Time) 컴파일러
       - 인터프리터의 느린 실행속도를 보완하기 위해 도입된 방식
       - 바이트 코드 전체를 컴파일 해 바이너리 코드로 변경하고 이후에는 메서드를 더 이상 인터프리팅 하지 않음, 컴파일된 전체 바이트 코드만 실행하면 됨
+      - C1 컴파일러
+        - 주로 GUI 애플리케이션 및 기타 클라이언트 프로그램에 사용
+        - C2보다 컴파일 시간도 짧고 단순하게 설계됨
+      - C2 컴파일러
+        - 주로 실행시간이 긴 서버 애플리케이션에 사용
+        - C1보다 컴파일 시간이 길지만 높은 수준의 최적화를 지원
 
 
 
@@ -57,15 +66,15 @@
 
 #### JVM 구성
 
-- Class Loader(클래스 로더)
+- **Class Loader(클래스 로더)**
 
   > JVM내로 클래스 파일(.class)들을 로드하고, 링크를 통해 배치하는 작업을 수행
 
   - 자바는 동적코드이기에 컴파일 타임이 아니라 런타임에(클래스를 최초로 참조할때) 클래스로더가 해당 클래스를 로드하고 링크 한다.
 
-- Excution Engine(실행 엔진)
+- **Excution Engine(실행 엔진)**
 
-  > 클래스 로더에 의해 JVM내에 링크 + 로드된 클래스(바이트 코드)를 실행시킨다
+  > 클래스 로더에 의해 JVM내에 링크 + 로드된 클래스(바이트 코드, .class)를 실행시킨다
   >
   > 자바 바이트 코드(.class)는 기계가 바로 수행 불가한 언어, 그래서 실행 엔진이 바이트 코드를 JVM 내부에서 기계가 실행할 수 있는 형태로 변경(아래 두가지 방식 채택)
 
@@ -78,7 +87,7 @@
   - Garbage Collector
     - Garbage Collecting을 수행하는 쓰레드가 있다
 
-- Runtime Data Area
+- **Runtime Data Area(JVM의 메모리 공간)**
 
   > 프로그램을 수행하기 위해 OS로부터 할당받은 메모리 공간
 
@@ -259,11 +268,709 @@
 
 ### Old 영역의 GC
 
+> 데이터가 가득차면 GC를 수행 GC방식은 JDK 7을 기준으로 5가지 방식 존재
+
+#### **GC 방식**
+
+- Serial GC
+  - 절대 사용하면 안되는 방식
+  - CPU 코어나 하나만 있을때 사용하기 위한 방식
+- Parallel GC
+- Parallel Old GC
+- Cocurrent Mark & Sweep GC(CMS)
+- G1 GC
 
 
-### G1 GC
+
+#### G1 GC
+
+<img src="https://user-images.githubusercontent.com/41468004/137474088-59bd971a-cf94-4618-8b0a-c2a0c15d7fba.png" style="zoom: 33%;" />
+
+- 지금까지의 Young과 Old 영역을 잊자
+- 그림과 같이 바둑판의 각 영역에 객체를 할당하고 GC를 수행
+- 즉, Young의 세가지 영역에서 Old 영역으로 이동하는 방식이 사라진 GC방식
 
 
 
 [출처 - Naver D2](#https://d2.naver.com/helloworld/1329)
+
+
+
+## Java SE, EE
+
+> 둘 다 Java 프로그래밍 언어로 애플리케이션 서버를 프로그래밍하기 위해 폭 넓게 사용되는 플랫폼
+
+### Java SE
+
+> Java Platform, Standard Edition이라고 한다
+
+- 대부분의 사람들이 자바 프로그래밍 하면 떠올리는 플랫폼
+
+
+
+### Java EE
+
+> Java Platform, Enterprise Edition이라고 한다
+
+- Java SE 스펙을 기반으로 하며 그 위에 탑재된다
+- 대규모, 다계층, 확장성, 신뢰성 네트워크 어플리케이션의 개발과 실행을 위한 API 및 환경을 제공한다
+
+- SE의 API에 JAR파일들을 추가한것
+
+
+
+## JDK, JRE
+
+### JDK
+
+> Java를 사용하기 위해 필요한 모든 기능을 갖춘 Java용 SDK(Software Development Kit)
+
+- 프로그램을 생성하고 컴파일 할 수 있음( Java 프로그래밍 및 실행을 하고 싶으면 )
+- JRE를 포함하고 있으면 JRE의 상위 집합이다
+
+
+
+### JRE
+
+> Java Runtime Envirionment의 약자이다
+>
+> JVM이 자바 프로그램을 동작시킬 때 필요한 라이브러리들을 가지고 있다
+
+- JVM의 실행환경을 구현했다고 생각하면 된다
+- Java 프로그램을 실행시키는데 목적이 있다
+- 다만 그냥 실행을 시키더라도 JDK를 다운 받아야하는 경우 존재
+  - JSP를 이용하여 웹 어플리케이션을 배포하는 경우 => JSP를 Java 서블릿으로 변환 -> JDK를 이용한 서블릿 컴파일
+
+
+
+## Java의 장단점
+
+### 장점
+
+- OS에 독립적이다
+  - Java는 JVM이라는 가상머신 위에서 동작하기에 특정 운영체제에 종속되지 않는다
+- 객체지향 언어이다
+  - 객체지향적으로 코딩하기 위해 여러 언어적 지원을 한다(캡슐화, 상속, 추상화, 다형성 등)
+  - 객체지향 패러다임 특성상 비교적 이해하고 배우기 쉽다
+- 자동으로 메모리 관리를 해준다
+  - JVM에서 Garbage Collector라고 불리는 데몬 쓰레드에 의해 GC(Garbage Collection)가 일어난다
+  - 개발자는 메모리를 할당하고 해제하는 것에 신경쓸 필요 없이 비즈니스 로직에만 집중 가능
+- 오픈소스
+  - 정확히 말하자면 OpenJDK가 오픈소스이다
+- 멀티쓰레드 쉽게 구현 가능
+  - 스레드 생성 및 제어 관련 API를 제공하고 있기에 운영체제에 상관없이 멀티쓰레드 쉽게 구현 가능
+- 동적 로딩을 지원
+  - 애플리케이션이 실행될때 모든 객체가 로딩되는 것이 아니라 그때그때 필요한 클래스가 동적 로딩되어 생성된다
+  - 또한 유지보수 시 해당 클래스만 수정하면 되기에 재컴파일 필요 없다 => 유지보수가 쉽고 빠르다
+
+
+
+### 단점
+
+- 비교적 느리다
+  - 자바는 한번의 컴파일로 실행 가능한 기계어가 만들어지는 것이 아님
+  - 자바 컴파일러에 의해 변환된 .class 파일들을 JVM이 바로 실행 가능한 기계어가 아닌 바이트 코드
+  - 인터프리터 방식을 이용하기에 그때그때 필요한 명령어를 기계어로 변환하여 수행한다. 그렇기에 비교적 느림
+    - JIT 컴파일러를 도입하여 JVM의 성능이 꽤 향상됨
+- 예외처리가 불편
+  - 검사가 필요한 예외가 등장한다면 무조건 프로그래머가 선언해주어야 함
+
+
+
+## Java의 접근제어자
+
+| 접근 제어자 | 표시 | 설명                                                   |
+| :---------: | :--: | ------------------------------------------------------ |
+|   public    |  +   | 어떤 클래스의 객체에서든 접근 가능                     |
+|   private   |  -   | 외부에서 접근 불가능, 동일 클래스 내에서만 접근이 가능 |
+|  protected  |  #   | 상속받은 클래스 또는 같은 패키지에서만 접근이 가능     |
+|   package   |  ~   | 동일 패키지 내에 있는 클래스의 객체들만 접근 가능      |
+
+
+
+### Private
+
+<img src="https://user-images.githubusercontent.com/41468004/137480947-b72107a3-a2ae-4eb7-9463-54a8fc010357.png" style="zoom:50%;" />
+
+### Public
+
+<img src="https://user-images.githubusercontent.com/41468004/137481048-edf98477-1ae5-4fd0-8a68-871d4fcee41e.png" style="zoom:50%;" />
+
+
+
+### Protected
+
+<img src="https://user-images.githubusercontent.com/41468004/137481140-607c006b-d50c-4c9a-bc40-f5d67dfe3217.png" style="zoom:50%;" />
+
+
+
+### Default
+
+<img src="/Users/giri/Library/Application Support/typora-user-images/image-20211015204012869.png" style="zoom:50%;" />
+
+[출처](http://tcpschool.com/java/java_modifier_accessModifier)
+
+
+
+## Java의 데이터
+
+### Primitive Type(기본 데이터 타입)
+
+- 기본 타입의 종류는  byte, short, char, int, float, double, boolean이 있다
+  - 정수형 : byte, short, int, long
+  - 실수형 : float, double
+  - 논리형 : boolean
+  - 문자형 : char
+
+
+
+### Reference Type(참조 데이터 타입)
+
+- 참조 데이터 타입의 종류는 class, array, interface Enumeration이 있다
+  - 기본형을 제외하고는 모두 참조형
+  - new 키워드를 이용하여 인스턴스를 생성해 그 인스턴스의 주소를 참조하는 형태이다
+  - String, StringBuffer, StringBuilder, Collection 등...
+  - String과 배열은 참조 타입과 달리 new 없이도 생성 가능하지만 참조형이다
+- 참조 데이터는 크기가 가변적이기에 동적으로 관리되는 Heap 영역에 저장
+  - Heap 영역은 GC 대상이므로 참조형 데이터들은 GC의 대상이다
+- 참조 타입은 값이 지정된 곳의 주소, 즉 객체의 주소를 저장하는 공간이다(Call by Value(주소값))
+
+
+
+### Collection
+
+> List, Map, Set 인터페이스를 기준으로 여러 구현체가 존재
+
+
+
+##### Why? 왜 쓸까?
+
+- 다수의 Data를 다루는데 표준화된 클래스들을 제공해주기에 Data Structure를 직접 구현하지 않아도 되는 편리함
+- 또한 객체의 수를 동적으로 할당 가능
+  - 하지만 자료형의 크기가 예측 가능하다면 지정해주는 것이 좋음
+  - Collection들은 보통 default 사이즈가 존재하는데 이 사이즈보다 커질 경우 재할당이 일어나기 때문
+  - 약간의 성능 저하 이슈
+
+
+
+##### List
+
+- List 인터페이스를 `@Override`를 통해 직접 구현할 수도 있으며 `ArrayList, LinkedList` 구현체를 사용하기도 함
+
+
+
+##### Map
+
+- 대표적인 구현체로는 `HashMap` 존재
+  - 멀티쓰레드 환경에서 `HashTable`과 차이점이 있다
+- key-value의 구조로 이루어져 있으며 순서를 보장하지 않는다
+- 순서를 보장하기 위해서는 `LinkedHashMap` 사용
+
+
+
+##### Set
+
+- 대표적인 구현체로는 `HashSet`존재
+
+- Value에 대한 종복값을 저장하지 않는다
+- 순서를 보장하지 않으며 순서를 보장하기 위해서는 `LinkedHashSet` 사용
+
+
+
+##### Stack & Queue
+
+- `Stack`은 직접 `new 키워드`로 사용가능
+- `Queue`는 `JDK1.5`부터 `LinkedList`에 `new`를 사용해서 사용 가능
+
+
+
+### Wrapper Class
+
+> 프로그램에 따라 기본 타입의 데이터를 객체로 취급해야 하는 경우 존재
+>
+> 이때 기본 타입의 데이터를 Wrapper Class로 변환한 후 작업을 수행해야 한다
+
+#### Java에서 제공하는 Wrapper Class
+
+| 기본 타입 | Wrapper Class |
+| :-------: | :-----------: |
+|   byte    |     Byte      |
+|   short   |     Short     |
+|    int    |    Integer    |
+|   long    |     Long      |
+|   float   |     Float     |
+|  double   |    Double     |
+|   char    |   Character   |
+|  boolean  |    Boolean    |
+
+
+
+#### Boxing, Unboxing
+
+> wrapper class는 산술 연산을 위해 정의된 클래스가 아니므로 인스턴스에 저장된 값을 변경할 수 없음
+>
+> 단지 값을 참조하기 위해 새로운 인스턴스를 생성하고, 생성된 인스턴스의 값을 참조할 수 있다
+
+<img src="https://github.com/WeareSoft/tech-interview/blob/master/contents/images/java_boxing_unboxing.png?raw=true"  />
+
+```java
+//Boxing
+int i = 10;
+Integer num = new Integer(i);
+
+//Unboxing
+Integer num = new Integer(10);
+int i = num.intValue();
+```
+
+
+
+#### Auto Boxing & Unboxing
+
+> jdk 1.5 부터는 자바 컴파일러가 박싱과 언박싱이 필요한 상황에 자동으로 처리를 해줌
+
+```java
+//Auto Boxing
+int i = 10;
+Integer num = i;
+
+//Auto Unboxing
+Integer num = new Integer(10);
+int i = num;
+```
+
+
+
+#### 성능
+
+편의성을 위해 오토 박싱과 언박싱을 제공하지만 내부적으로 추가적인 연산이 발생함
+
+그러므로 동일한 타입 연산이 이루어지도록 구현하는 것이 중요
+
+
+
+#### 래퍼 클래스 비교 연산
+
+- 래퍼 클래스의 비교 연산도 오토언박싱을 통해 가능, but 인스턴스에 저장된 값의 동등 여부 판단은 `==`가 아닌 `equals()`메소드를 사용해야 함
+- 래퍼 클래스도 객체이므로 `==`연산자를 사용하게 되면 값의 비교가 아니라 주소값의 비교가 이루어지기 때문
+
+
+
+## Call By Value & Call By Reference
+
+#### Call By Value
+
+> 값에 의한 호출
+
+- 함수가 호출될 때, 메모리 공간 안에서는 함수를 위한 별도의 임시공간이 생성됨(종료 시 해당 공간 사라짐)
+- 함수 호출 시 전달되는 변수 값을 복사해서 함수 인자로 전달함
+- 이때 복사된 인자는 함수 안에서 지역적으로 사용되기에 local value 속성을 가짐
+  - `따라서, 함수 안에서 인자 값이 변경되어도, 외부 변수 값은 변경안됨`
+
+
+
+#### Call By Reference
+
+>참조에 의한 호출
+
+- 함수 호출 시 인자로 변수의 레퍼런스를 전달함
+- 따라서 함수 안에서 인자 값이 변경되면 전달인자로 전달된 객체의 값도 변경됨
+
+
+
+#### Java함수 호출 방식
+
+> 자바의 경우는 항상 **Call By Value**로 값을 넘긴다
+
+- C/C++와 같이 변수의 주소값 자체를 가져올 방법이 없음, 이를 넘길 방법도 없음
+- reference type(참조 자료형)을 넘길 시에는 해당 객체의 주소값을 복사해서 복사된 주소값을 넘김
+- 따라서 **원본 객체의 프로퍼티까지는 접근 가능, 원본 객체를 교체할 수는 없다**
+
+```java
+User a = new User("gyoogle");   // 1
+
+foo(a);
+
+public void foo(User b){        // 2
+    b = new User("jongnan");    // 3
+}
+```
+
+- 주소값을 복사하는 것이기에 위 코드를 실행하고나서 a객체의 값을 호출해보면 `gyoogle`이 출력됨
+
+
+
+## String / new String
+
+```java
+String test1 = "test";
+String test2 = "test";
+String test3 = new String("test");
+String test4 = new String("test");
+```
+
+#### 왜 이렇게 다양한 방식이 존재? 우선 두 방식의 차이점을 알아보자
+
+1. `String`으로  선언하는 객체는 JVM 메모리구조에서 `String Constant Pool(SCP)`내에 객체로 생성 후 존재
+2. `new String`으로 선언하는 객체는 SCP가 아닌` JVM의 Heap영역` 내의 개별 객체로 만들어짐
+
+- ?? 뭔소리 그냥 두 객체가 서로 다른 공간에 할당된다는 것만 알자!!
+
+
+
+#### 그럼 어떻게 다른 공간에 할당되는건지 알아보자!
+
+
+
+##### String으로 선언해서 사용하는 방식
+
+<img src="https://user-images.githubusercontent.com/41468004/137495315-684c0e9b-56bf-4a87-8f54-aa59d7a7e2be.png" style="zoom: 55%; " />
+
+- SCP내의 하나의 인스턴스로 생성 된다
+- 만약 동일한 리터럴(문자열 값)을 가지는 인스턴스가 여러개 존재한다면 새로운 String 인스턴스를 생성하지 않는다
+- 기존에 SCP에 존재하는 인스턴스의 주소값을 참조하게 된다
+  - 위에서 test1, test2 변수
+
+
+
+##### new String으로 선언해서 사용하는 방식
+
+<img src="https://user-images.githubusercontent.com/41468004/137495901-2c9305c2-b50c-46db-888e-dacaa6292da5.png" style="zoom:55%;" />
+
+- new String으로 선언하는 경우 Heap 영역 어딘가에 새로운 객체로 생성된다
+- 리터럴이 같아도 독립적으로 생성됨
+
+
+
+이걸 통해 알 수 있듯이 `String`은 `Immutable`하며 문자열을 조작한다고 해서 `인스턴스의 값이 변경되는 것이 아니다`
+
+**새로운 인스턴스가 생성되는 것이다**
+
+
+
+#### 따라서 맨위의 코드에서 생성되는 객체는 총 3개이다
+
+
+
+## String, StringBuilder, StringBuffer
+
+| 분류   | String    | StringBuffer                  | StringBuilder       |
+| ------ | --------- | ----------------------------- | ------------------- |
+| 변경   | Immutable | Mutable                       | Mutable             |
+| 동기화 |           | Synchronized가능(Thread-safe) | Synchronized 불가능 |
+
+1, String
+
+- 문자열 연산시 새로 객체를 만드는 오버헤드 발생
+- 객체가 불변하므로, 멀티쓰레드 환경에서 동기화를 신경쓰지 않아도 된다. (조회 연산에 매우 큰 장점)
+
+- ***문자열 연산이 적고, 조회가 많은 멀티쓰레드 환경에서 좋음***
+
+
+
+2. StringBuffer, StringBuilder
+   - 공통점
+     - new 연산으로 클래스를 하나만 만듬 (Mutable)
+     - 문자열 연산시 세로 객체를 만들지 않고 크기를 변경시킨다
+     - StringBuffer와 StringBuilder 클래스의 매소드가 동일함
+   - 차이점
+     - StringBuffer는 Thread-Safe
+     - StringBuilder는 Thread-Unsafe
+   - StringBuffer
+     - 문자열 연산이 많은 Multi-Thread 환경
+   - StringBuilder
+     - 문자열 연산이 많은 Single-Thread 또는 Thread 신경 안쓰는 환경
+
+
+
+## OOP의 4가지 특징
+
+1. Abstraction(추상화)
+
+   - 구체적인 사물들의 공통적인 특징을 파악해서 이를 하나의 개념으로 다루는 것
+
+   
+
+2. Encapsulation(캡슐화)
+
+   - 정보 은닉: 외부에서 접근하지 못하도록 정보를 제한하는 것
+   - 높은 응집도, 낮은 결합도를 유지하여 유연함과 유지보수성 증가
+
+   
+
+3. Inheritance(상속)
+
+   - 여러 개체들이 가진 공통된 특성을 부각시켜 하나의 개념이나 법칙으로 성립시키는 과정
+
+   
+
+4. Polymorphism(다형성)
+
+   - 서로 다른 클래스의 객체가 같은 메시지를 받았을때 각자의 방식으로 동작하는 능력
+   - 오버라이딩, 오버로딩
+
+
+
+## OOP의 5대 원칙
+
+> **SOLID** 원칙
+
+- S: 단일 책임 원칙
+  - 객체는 단 하나의 책임만 가져야 함
+- O: 개방-폐쇄의 원칙
+  - 기존의 코드를 변경하지 않으면서 기능을 추가할 수 있어야함
+- L: 리스코프 치환 원칙
+  - 자식 클래스는 최소한 부모 클래스에서 가능한 행위는 수행 가능해야함
+- I: 인터페이스 분리 원칙
+  - 인터페이스를 클라이언트에 특화되도록 분리시키라는 원칙
+- D: 의존 역전 원칙
+  - 의존 관계를 맺을 때 거의 변화하기 어려운 것, 변화가 없는 것에 의존하라는 것
+
+
+
+## 객체지향 프로그래밍 vs 절차지향 프로그래밍
+
+- 절차지향 프로그래밍
+  - 실행하고자 하는 절차를 정해서 그 절차대로 프로그래밍
+  - 목적을 달성하기 위한 흐름에 중점을 둠
+- 객체지향 프로그래밍
+  - 실세상의 물체를 객체로 표현하고, 이들 사이의 관계, 상호 작용을 프로그램으로 나타낸다
+  - 객체를 추출하고 객체들의 관계를 결정, 이들의 상호 작용에 필요한 함수와 변수를 설계 및 구현한다
+  - 객체 지향의 핵심은 연관되어 있는 변수와 메서드를 하나의 그룹으로 묶는 것이다
+  - 사람의 사고와 가장 비슷하게 프로그래밍 하기 위해 생성된 기법
+
+
+
+## 객체지향
+
+> 객체
+>
+> - 현실세계의 실체 및 개념을 반영하여 상태와 행위를 정의한 데이터의 집합
+>
+> 객체지향 프로그래밍
+>
+> - 각자의 역할을 지닌 객체들끼리 서로 메시지를 주고 받으며 동작할 수 있도록 프로그래밍 하는 것
+
+
+
+#### 장점
+
+- 사람의 관점에서 프로그래밍 하고 이해하기 쉽다
+- 강한 응집력, 약한 결합력을 가진다
+- 재사용성, 확장성이 높다
+
+
+
+#### 단점
+
+- 객체 간의 정보 교환이 모두 메시지 교환을 통해 이루어지기에 시스템이 많은 오버헤드 발생
+
+  - 처리속도가 상대적으로 느리다
+  - 하드웨어의 발전으로 이 단점 어느정도 커버
+
+- 객체가 상태(변수)를 갖기에 객체가 예측할 수 없는 상태값을 가져 버그를 일으킬 수 있다
+
+  - 이는 함수형 프로그래밍 등장의 패러다임이다
+
+    > 함수형 프로그래밍
+    >
+    > - 모든 것을 순수 함수로 나누는 기법, 문제를 작은 문제들로 쪼개고 작은 문제를 해결하기 위한 함수를 작성
+
+
+
+#### 특징
+
+- 추상화
+  - 객체의 공통된 속성이나 기능을 추출하는 것
+  - 중요하지 않은 것은 감추거나 무시, 중요한 것만 추출
+- 캡슐화
+  - 내부의 데이터나 함수를 외부헤서 참조하지 못하도록 차단
+  - 정보 은닉화
+- 다형성
+  - 같은 코드라고 하더라도 상황에 따라 다르게 동작하는 성질
+  - Overriding
+    - 임의의 클래스가 어떤 클래스를 상속 받거나 인터페이스를 구현했을 시 상위 클래스, 인터페이스에 정의되어 있는 함수를 재정의 하는 것
+    - 인터페이스의 경우는 오버라이딩이 강제
+  - Overloading
+    - 메소드명, 리턴값 동일, but 주어진 인자에 따라 다르게 동작
+- 상속
+  - 부모의 형질을 이어받는다는 뜻
+  - 부모의 속성과 메소드를 그대로 사용할 수 있으며 거기에 속성/메소드를 추가할 수 있다
+  - 상속시 오버라이딩을 통해 재정의하여 다르게 동작하게끔 가능
+- 클래스
+  - 객체를 만들기 위해 상태(field)와 행위(method)를 정의한 틀
+- 메시지
+  - 객체지향적으로 구현된 프로그램은 객체끼리 메시지를 주고받으며 상호작용함
+  - 즉, 임의의 객체에게 전달인자를 주어 메소드 호출 그리고 리턴값을 받아 처리
+
+
+
+## Java의 Static 멤버와 Non-Static 멤버의 차이
+
+#### Non-Static 멤버
+
+- 공간적 특성: 멤버가 객체마다 별도로 존재
+  - `인스턴스 멤버`라고 부른다
+- 시간적 특성: 인스턴스의 생명 주기를 따라간다
+- 공유의 특성: 공유되지 않는다
+  - 인스턴스 멤버는 인스턴스 각각의 독립적인 공간을 유지
+
+
+
+#### Static 멤버
+
+- 공간적 특성: 멤버가 클래스당 존재
+  - 멤버는 객체 내부가 아닌 별도의 공간에 생성
+  - `클래스 멤버`라고 부른다
+- 시간적 특성: 클래스 로딩시에 생성
+  - 프로그램이 종료되면 사라진다
+  - 인스턴스가 사라져도 멤버가 사라지지 않음
+  - 인스턴스를 만들지 않아도 사용 가능
+  - 프로그램이 종료될 때 사라진다
+- 공유의 특성: 동일한 클래스 내의 모든 인스턴스들이 공유한다
+
+
+
+## Java의 main함수가 static인 이유
+
+- `static`키워드
+  - `static`멤버는 클래스 로딩(프로그램 시작)시 메모리에 로드되어 인스턴스를 생성하지 않아도 사용 가능
+- main 메서드가 `static`인 이유
+  - JVM은 인스턴스가 없는 클래스의 `main()`함수를 호출해야하기에 `static`이어야 한다
+- `JVM`과 `static`
+  - 코드를 실행하면 컴파일러가 `.java` 코드를 `.class(바이트 코드)`로 변환
+  - 클래스 로더가 `.class` 파일을 JVM의 `메모리 영역(Runtime Data Area)`에 올린다
+  - `Runtime Data Area` 중` Method Area(= Class Area, Static Area)`라고 불리는 영역에 `Class Variable`이 저장되는데 여기에 `static 변수`도 저장
+  - JVM은 `Method Area`에 로드된 `main()`을 실행
+
+
+
+## Java의 final 키워드
+
+- final
+
+  > 변수나 메서드 또는 클래스가 `변경 불가능` 하도록 만든다
+
+  - 원시(Primitive) 변수에 적용 시
+    - 해당 변수의 값은 변경 불가
+  - 참조(Reference) 변수에 적용 시
+    - 해당 참조 변수가 힙 내의 다른 객체를 가리키도록 변경 불가능
+  - 메서드에 적용
+    - 해당 메서드를 오버라이드 불가
+  - 클래스에 적용
+    - 해당 클래스의 하위 클래스 정의 불가
+
+- finally
+
+  > try/catch 블록이 종료될 때 항상 실행될 코드 블록을 정의하기 위해 사용
+
+  - finally 블록은 예외가 발생하더라도 항상 실행
+    - 단 JVM이 try 수행중에 종료되는 경우는 제외
+
+- finalize() 메소드
+
+  > GC가 더상의 참조가 되지 않는 객체들을 메모리에서 삭제하겠다고 결정하는 순간 호출되는 메소드
+
+  - Object 클래스에 정의되어 있으며 오버라이드 해서 맞춤별 GC 정의 가능
+    - `protected void finalize() throws Throwable { //파일 닫기, 소켓 닫기, 자원 반환 등 }`
+
+
+
+## Java의 Serialization, Deserialization
+
+#### 직렬화(Serialization)
+
+> - 자바 시스템 내부에서 사용되는 객체, 데이터를 외부의 자바 시스템에서도 사용 가능하게 바이트 형태로 변환하는 기술
+> - 즉, JVM의 Heap 영역에 상주되어 있는 객체 데이터를 바이트 형태로 변환하는 기술
+
+
+
+- 직렬화 조건
+  - 자바에서는 간단하게 `java.io.Serializable`인터페이스 구현으로 직렬화/역직렬화 가능
+- 직렬화 대상
+  - Serializable 인터페이스 상속받은 객체
+  - Primitive 타입의 데이터
+  - Primitive 타입이 아닌 Reference 타입의 객체들은 Serializable 인터페이스를 구현해야 한다
+
+- 직렬화 방법
+
+  - serialVersionUID를 만들어준다
+
+  ```java
+  @Entity
+  @AllArgsConstructor
+  @toString
+  public class Post implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private String title;
+    private String content;
+  }
+  ```
+
+  
+
+  - `ObjectOutputStream`으로 직렬화 진행.
+
+  ```java
+  Post post = new Post("title", "content");
+  byte[] serializedPost;
+  
+  //아래와 같은 try문은 소괄호 안의 자원을 try문 종료시에 해제시키겠다는 것
+  try (ByteArrayOutputStream baos = new ByteArrayOnputStream(serializedPost)) {
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(post);
+      
+      serializedPost = baos.toByteArray();
+    }
+  }
+  ```
+
+
+
+#### 역직렬화(Deserialization)
+
+> - 바이트로 변환된 데이터를 다시 객체로 변환
+> - 직렬화된 바이트 데이터를 객체로 변환해 JVM의 Heap에 상주시키는 것
+
+
+
+- 역직렬화 조건
+
+  - 직렬화 된 객체의 클래스가 클래스 패스에 존재해야하며 import되어 있어야 한다
+  - 동일한 serialVersionUID를 가지고 있어야 함
+    - `private static final long serialVersionUID = 1L;`
+
+- 역직렬화 방법
+
+  - `java.io.ObjectInputStream`객체를 이용
+
+  ```java
+  try (ByteArrayInputStream bais = new ByteArrayInputStream(serializedPost)) {
+    try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+  
+      Object objectPost = ois.readObject();
+      Post post = (Post) objectPost;
+    }
+  }
+  ```
+
+  
+
+#### 직렬화 serialVersionUID
+
+위의 코드에서 `serialVersionUID`를 직접 지정해줬었다. 사실 지정하지 않아도 알아서 해시값이 할당 됨
+
+직접 설정 이유는 기존의 클래스 멤버 변수가 변경되면 `serialVersionUID`가 달라지는데, 역직렬화 시 오류 발생
+
+
+
+#### 요약
+
+- 데이터를 통신 상에서 전송 및 저장하기 위해 사용되는 기술
+- 개발자가 직접 컨트롤할 수 없는 클래스는 직렬화 사용 지양
+- 직렬화 데이터는 타입,클래스 메타정보를 포함하고 있기에 사이즈가 큼
+  - 트래픽에 따라 비용 증가할 수 있으므로 JSON을 사용하는 것이 좋다
+
+
 
