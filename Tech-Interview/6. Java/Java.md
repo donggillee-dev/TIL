@@ -14,7 +14,19 @@
 
 - [String, StringBuilder, StringBuffer](#string,-stringbuilder,-stringbuffer)
 
+- [클래스, 객체, 인스턴스](#클래스,-객체,-인스턴스)
 
+- [오버로딩과 오버라이딩](#오버로딩과-오버라이딩)
+
+- [인터페이스와 추상클래스](#인터페이스와-추상클래스)
+
+- [Reflection](#reflection)
+
+- [Stream](#stream)
+
+- [HashMap vs HashTable](#HashMap-vs-HashTable)
+
+- [HashSet vs TreeSet](#hashset-vs-treeset)
 
 
 
@@ -973,4 +985,263 @@ String test4 = new String("test");
   - 트래픽에 따라 비용 증가할 수 있으므로 JSON을 사용하는 것이 좋다
 
 
+
+## 클래스, 객체, 인스턴스
+
+### 클래스
+
+- 객체를 만들어 내기 위한 틀
+- 연관되어 있는 변수와 메서드의 집합
+
+
+
+### 객체
+
+- 소프트웨어 세계에 구현할 대상
+- 클래스에 선언된 모양 그대로 생성된 실체
+- `클래스의 인스턴스`라고도 한다
+- OOP관점에서 클래스 타입으로 선언되었을 때 객체라고 한다
+
+
+
+### 인스턴스
+
+- 설계도를 바탕으로 소프트웨어 세계에 구현화된 실체
+  - 객체를 소프트웨어에 실체화 하면 인스턴스 라고 부른다
+  - 즉, 실체화된 인스턴스는 메모리에 할당된다.
+- 인스턴스는 객체에 포함된다
+
+- OOP관점에서 객체가 메모리에 할당되어 실제 사용될(인스턴스화) 때 인스턴스라고 한다
+
+
+
+```java
+/* Class */
+public class Animal {
+	...
+}
+
+public class Main {
+  public static void main(String[] args) {
+    Animal cat, dog; //객체
+    
+    //인스턴스화
+    cat = new Animal(); //cat은 Animal 클래스의 인스턴스
+    dog = new Animal(); //dog은 Animal 클래스의 인스턴스
+  }
+}
+```
+
+- 클래스 vs 객체
+  - 클래스는 설계도, 객체는 설계도로 구현할 대상
+- 객체 vs 인스턴스
+  - 크래스의 타입으로 단지 선언만 되었을 때 객체라고 하고, 그 객체가 메모리에 할당되었을 때가 인스턴스
+  - 객체는 현실세계에 가깝고, 인스턴스는 소프트웨어 세계에 가깝다
+- 추상화 기법
+  - 분류
+    - 객체 -> 클래스
+    - 실존하는 객체들을 공통적인 속성을 공유하는 하나의 범주 또는 추상적인 개념으로 묶는 행위
+  - 인스턴스화
+    - 객체 -> 인스턴스
+    - 분류의 반대, 범주나 개념으로부터 실존하는 객체를 만드는 과정
+
+
+
+## 오버로딩과 오버라이딩
+
+- 오버로딩
+
+  - 두 메서드가 같은 이름을 갖고 있으나 인자의 수나 자료형이 다른 경우
+  - 리턴값과 함수명 동일, 인자가 다름
+
+- 오버라이딩
+
+  - 상위 클래스의 메서드와 이름과 용례가 같은 함수를 하위 클래스에 재정의하는 것
+
+  - 상속 관계에 있는 클래스 간에 같은 이름의 메서드를 정의
+
+    ```java
+    public abstract class Shape {
+        public void printMe() { System.out.println("Shape"); }
+        public abstract double computeArea();
+    }
+    public class Circle extends Shape {
+        private double rad = 5;
+        @Override // 개발자의 실수를 방지하기 위해 @Override(annotation) 쓰는 것을 권장
+        public void printMe() { System.out.println("Circle"); }
+        public double computeArea() { return rad * rad * 3.15; }
+    }
+    public class Ambiguous extends Shape {
+        private double area = 10;
+        public double computeArea() { return area; }
+    }
+    
+    ```
+
+
+
+## 인터페이스와 추상클래스
+
+### 추상 메서드
+
+- abstract 키워드와 함께 원형만 선언되고, 코드는 작성되지 않은 메서드
+
+  ```java
+  public abstract String getName(); //추상 메서드
+  public abstract String fail() { return "Fail" } //추상 메서드 아님
+  ```
+
+  
+
+### 추상 클래스
+
+#### 개념
+
+- abstarct 키워드로 선언된 클래스
+
+- 추상 메서드를 최송 하나 이상 가지고 abstract로 선언된 클래스
+- 추상 메서드가 없어도 abstract로 선언한 클래스
+
+#### 추상 클래스의 구현
+
+- 서브 클래스에서 슈퍼 클래스의 모든 추상 메서드를 오버라이딩하여 실행 가능한 코드로 구현
+
+#### 추상 클래스의 목적
+
+- 객체를 생성하기 위한 목적이 아님, 상속을 위한 부모 클래스로 활용하기 위함
+- 여러 클래스들의 공통된 부분을 추상화하여 상속받는 클래스에서 구현을 강제하기 위함
+
+
+
+### 인터페이스
+
+#### 개념
+
+- 추상 메서드와 상수만을 포함, interface 키워드를 사용하여 선언한다 
+
+#### 인터페이스의 구현
+
+- 인터페이스를 상속받고(implements), 추상 메서드를 모두 구현한 클래스를 작성한다
+
+#### 인터페이스의 목적
+
+- 상속받을 서브 클래스에게 구현할 메서드들의 원형을 모두 알려주어, 클래스가 자신의 목적에 맞게 메서드를 구현하도록 하는 것이다.
+- 구현 객체들의 같은 동작을 보장하기 위한 목적
+
+
+
+### 추상 클래스 vs 인터페이스
+
+#### 공통점
+
+- 그 자체만으로 인스턴스 생성 불가능
+- 선언만 있고 구현은 없다
+- 자식 클래스가 상속받아서 사용하며 구체적은 내용을 구현하는 것을 강제한다
+
+#### 차이점
+
+- 서로 다른 목적을 가지고 있다
+  - 추상 클래스는 상속을 위한 부모 클래스
+  - 인터페이스는 구현 객체의 같은 동작을 보장
+
+- 추상 클래스는 클래스, 인터페이스는 클래스가 아님
+- 추상 클래스는 단일 상속이지만 인터페이스는 다중 상속이 가능
+
+
+
+
+
+## Reflection
+
+>  자바에서 이미 로딩이 완료된 클래스에서 또 다른 클래스를 동적으로 로딩하여 생성자, 멤버, 메서드 등을 사용할 수 있는 기법
+
+- 사용 방법
+  - Class.forName("name");
+
+- 사용 이유?
+  - 실행 시간에 다른 클래스를 동적으로 로딩해 접근할 때
+  - 클래스와 멤버 필드 그리고 메서드 등에 대한 정보를 얻어야할 때
+
+
+
+## Stream
+
+> Java8에서 추가된 API이며 컬렉션 타입의 데이터를 Stream 메소드에서 내부 반복을 통해 정렬, 필터링 가능
+
+#### 특징
+
+- 병렬 처리에 유리
+  - 병렬 처리를 위해 `common fork join pool`을 사용하는 `parallel()`메소드 제공
+  - `common fork join pool`
+    - 각 스레드가 개별 큐를 가지고 있으며, 놀고 있는 스레드가 일하고 있는 스레드의 작업을 가져와 수행함
+  - 코어의 수와 데이터의 수가 많고 데이터당 처리 시간이 길수록 병렬 처리가 빛을 발한다
+  - 배열, ArrayList 사용 시 유리
+- Immutable
+  - 원본 데이터 변경이 불가함
+- lazy
+  - 스트림에는 중간 연산과 최종 연산이 있는데 중간 연산을 여러개 작성 시 모두 합쳐서 진행하고, 합쳐진 연산을 최종 연산에서 한 번에 처리
+
+
+
+#### 장점
+
+- 내부 반복을 사용하기에 불필요한 코딩 줄이고 가독성 향상 + 최적화된 병렬 처리
+  - Collection은 외부 반복을 사용, 병렬처리 하기 위해서는 `synchronized`사용해야함
+
+  <img src="https://user-images.githubusercontent.com/41468004/137576340-6c9d605d-2d6d-4b9c-b350-8fd0b5ff13a9.png" style="zoom: 50%;" />
+
+
+
+## HashMap vs HashTable
+
+#### 공통점
+
+- 유니크한 Key-Value의 쌍을 저장하는 자바 Collection 객체
+
+#### 차이점
+
+- HashTable의 경우 내부 메서드에 `synchronized`키워드를 붙여서 명시적으로 동기화 수행하지만 HashMap의 경우 그렇지 않다
+
+  - 따라서 멀티 쓰레드 환경에서 HashTable은 Thread Safe를 보장하지만 상대적으로 느리다
+  - HashMap은 Thread Safe하지 않지만 상대적으로 빠르다
+
+- HashTable에서는 객체 저장시에 hashCode를 구현한 객체만 저장 가능하기에 null 저장 불가능, HashMap의 경우에는 null에 대한 예외 허용
+
+- HashMap은 보조 해시함수와 Seperate Chaining 방식을 사용하기에 HashTable보다 충돌이 덜 일어난다.
+
+  
+
+
+
+## HashSet vs TreeSet
+
+#### HashSet
+
+- Set 인터페이스의 구현체
+- 객체들을 순서 없이 저장하고 동일한 객체는 중복 저장 안함
+- 커스텀 객체의 중복 여부 확인
+  - 커스텀 객체 저장 시 객체의 `hashCode()`메소드를 호출 해 해시코드를 얻어낸 뒤
+  - 동일한 hashCode를 가지는 두 객체가 있다면 `equals()`메소드로 두 객체를 비교해 true가 나오면 동일 객체라고 판단
+
+#### TreeSet
+
+- Set 컬렉션의 검색 기능을 강화한 컬렉션
+- 이진 트리 구조를 사용하여 tree 구조를 가진다
+
+
+
+#### HashSet vs TreeSet
+
+- HashSet
+  - 해시테이블을 이용하여 구현하기에 그 요소들이 정렬되지 않음 
+  - add, remove ,contains 메소드들 O(1) 시간복잡도
+- TreeSet
+  - 트리 형태이며 각각의 요소들을 자동으로 정렬
+  - add, remove, contains 메소드들 O(log N) 시간복잡도
+
+
+
+#### LinkedHashMap
+
+> HashMap을 확장한 클래스, HashMap과 다르게 입려된 자료들의 순서를 기억한다
 
