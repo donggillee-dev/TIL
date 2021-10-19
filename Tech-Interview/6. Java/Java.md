@@ -690,10 +690,10 @@ String test4 = new String("test");
      - StringBuilder는 Thread-Unsafe
    - StringBuffer
      - 문자열 연산이 많은 Multi-Thread 환경
+     - 동기화를 해야하기에 StringBuilder보다는 속도가 느리지만 안정적이다
    - StringBuilder
      - 문자열 연산이 많은 Single-Thread 또는 Thread 신경 안쓰는 환경
-
-
+     - 동기화가 없기에 StringBuffer 보다는 빠르지만 안정적이지 못하다
 
 ## OOP의 4가지 특징
 
