@@ -2,12 +2,96 @@
 
 ## Node.js 비동기/동기 처리
 
-- https://meetup.toast.com/posts/73
+- Node.js는 비동기 I/O를 지원하면 Single-Thread 방식으로 동작
+- 병렬 Thread가 아니기에 Multi-Thread가 갖는 근원적인 문제에서 자유롭다
+  - 병렬 Thread는 클라이언트 요청마다 Thread 발생
+  - 동시 접속자 수가 늘어나면 Thread도 늘어난다
+  - 하지만 서버의 자원은 제한되어 있으므로 일정 수 이상의 Thread는 발생시킬 수 없음
+  - 그래서 서버 업그레이드 or Load-Balancing
+
+### 이벤트 루프
+
+- 클라이언트의 요청을 비동기로 처리하기 위해 이벤트 발생 -> 서버 내부에 메시지 형태로 전달
+- 이 메시지를 Event Loop가 처리
+- Event Loop가 작업을 처리하는 동안 제어권은 다음 요청으로 넘어가고 처리가 완료되면 Callback 호출해서 처리완료를 호출측에 알려줌(비동기)
+
+### Node.js의 약점
+
+- Event Loop는 Single-Thread로 되어있음
+- 즉, 요청 처리는 하나의 Thread 안에서 처리된다
+- 그래서 이벤트 호출은 비동기(콜백)으로 처리되지만 그 처리작업 자체가 오래 걸린다면 서버 전체에 영향을 끼칠 수 있음
+
+### Node.js의 올바른 사용
+
+- Single Thread이기에 대용량 파일 작업에는 안좋음
+- IO 작업이 별로 없거나 짧은 메시징 처리의 경우에는 빛을 발한다
+
+- 또한 가능한 비동기 처리 로직으로만 짜는 것이 중요하다(callback)
+
+### 올바른 Callback 사용
+
+- 비동기 처리 방식에서 Callback을 사용함으로써 비동기도 챙기고 실행 순서도 보장받을 수 있음
+- 다만 콜백 지옥에 빠지는 경우 존재
+- 이를 `async`로 해결 가능
+
+### Async & Await
+
+```javascript
+async function 함수명() {
+  await 비동기_처리_함수명(); //이때 이 함수가 await의 대상이 되는 axios 등 Promise를 반환하는 API호출 함수이어야 함
+}
+
+/////////
+
+function fetchItems() {
+  return new Promise(function(resolve, reject) {
+    let items = [1,2,3];
+    resolve(items);
+  })
+}
+
+async function logItems() {
+  let resultItems = await fetchItems();
+  console.log(resultItems);
+}
+```
+
+
 
 ## Node.js의 메모리 관리 동작 방식
 
-- https://codingjuny.tistory.com/58
-- https://hyunjun19.github.io/2018/02/19/node-js-at-scale-node-js-garbage-collection/
+### JavaScript 동작원리(Single-Thread)
+
+<img src="https://user-images.githubusercontent.com/41468004/137964792-51ff6b39-0260-4362-8d3f-d3e65e40776b.png" style="zoom:50%;" />
+
+#### Call Stack
+
+- 메인 쓰레드에서 호출되는 함수들은 콜 스택에 쌓인다
+- 이 함수들은 LIFO 방식으로 실행
+- 싱글 스레드 기반이기에 하나의 메인 쓰레드와 하나의 콜 스택을 가지고 있다
+
+#### Event Loop
+
+- 이벤트 발생 시 호출되는 콜백 함수들을 관리해서 테스크 큐에 쌓아 놓는다
+- 이벤트 루프가 콜 스택을 확인하고 비어있는 경우에만 Callback Queue에 있는 콜백 함수를 넘겨준다
+
+#### Callback Queue
+
+- web api에서 비동기 작업들이 실행된 후 호출된 콜백 함수들이 기다리는 공간
+- 이벤트 루프가 정해준 순서로 기다리게 되고 FIFO로 처리
+
+
+
+### Node.js의 GC
+
+- 참조형 객체들이 더 이상 참조되지 않을 시에 GC 대상이 된다
+
+#### New Space & Old Space
+
+- New Space는 새로운 할당이 일어나는 곳
+- GC가 자주 일어나는 곳
+- Old Space는 New Space에서 살아남은 애들이 존재한다
+- Old Space에서의 GC는 비용이 비싸기에 자주 일어나지 않는다
 
 
 
@@ -15,6 +99,8 @@
 
 - JPA에서 제공해주는 메서드로 처리 가능한 쿼리의 경우 JPA로 처리
 - 다중 조인, fetch(다중 컬럼 조회) 같은 경우 Custom 인터페이스를 정의 -> 해당 인터페이스를 상속받아 Qclass를 통해 로직을 구현하였습니다
+
+
 
 ## QueryDSL vs JPQL
 
@@ -24,6 +110,8 @@
   - 프로젝트 기간이 얼마 남지 않았다
   - 즉 비교적 쉬운 쿼리들은 QueryDSL로 처리하고 복잡한 다중조인(5중 조인 ㅎㄷㄷ...)들의 경우에는 JPQL로 쿼리를 짜자
     - 여기서 또 핵심적인 문제가 발생하는데 트랜잭션을 반환해주지 않아 Connection leak발생
+
+
 
 ## WebRTC란?
 
@@ -105,13 +193,81 @@
 
 ## Docker
 
+> 리눅스 컨테이너를 기반으로 하여 특정한 서비스를 패키징하고 배포하는 오픈소스 가상화 플랫폼
+
+### Container(컨테이너)
+
+![](https://user-images.githubusercontent.com/55429912/120686767-4dad8a00-c4dc-11eb-8d41-327fe1b45d27.png)
+
+`격리된 공간에서 프로세스가 동작하는 기술`
+
+- 애플리케이션 구동에 필요한 라이브러리 및 실행파일만 존재
+
+### Image(이미지)?
+
+<img src="https://user-images.githubusercontent.com/55429912/121000856-a6737000-c7c5-11eb-9efc-1f9d592eedb5.png" style="zoom:50%;" />
+
+`컨테이너 실행에 필요한 파일과 설정값 등을 포함하고 있는 것`
+
+- 상태값을 가지지 않고 변하지 않는다
+- 이미지는 컨테이너를 실행하기 위한 모든 정보를 가지고 있음 그래서 의존성 파일 설치 후 별도의 설치가 필요 없음
+  - 새로운 서버 추가되면 미리 만들어져있는 이미지를 다운받고 컨테이너를 생성하면 된다
+
+### 레이저 저장방식
+
+![](https://user-images.githubusercontent.com/55429912/121001380-31546a80-c7c6-11eb-8337-63567cf30c10.png)
+
+`이미지를 빌드할 때마다 이미 생성된 레이어가 캐시되어 재사용되기에 빌드 시간을 단축할 수 있다`
+
+#### 생성되는 결과물들은 어디에?
+
+> 도커 컨테이너가 실행되면 모든 읽기 전용 레이어들을 순서대로 쌓은 다음 마지막에 쓰기 가능한 신규 레이어를 추가한다.
+> 그 다음에 컨테이너 안에서 발생하는 결과물들이 쓰기 가능 레이어를 기록하게 되는 것
+
+### 컨테이너 업데이트
+
+![](https://user-images.githubusercontent.com/55429912/121002492-5c8b8980-c7c7-11eb-90be-c5a43934e058.png)
+
+1. 새 버전의 이미지를 다운
+2. 기존 컨테이너를 삭제
+3. 새 이미지를 기반으로 새 컨테이너 실행
+
+#### 장점
+
+- 애플리케이션 빠르게 배포 가능
+- 설치 및 확장이 쉽고 이식성 좋음
+- 관리가 쉽다
 
 
-## 
 
 ## Redis
 
-- 정리해야함
+> - 메모리 기반의 Key-Value 구조 데이터 관리 시스템
+> - 메모리에 저장하기에 빠른 Read,Write 속도를 보장하는 **비 관계형 데이터베이스**
+> - String, Set, Sorted Set, Hash, List의 데이터 형식을 가진다
+
+#### Memcached와 비교하면 다양한 데이터 타입을 제공하며 데이터를 디스크에 저장할 수 있어서 데이터와 빠이빠이 안해도 된다
+
+### Redis 특징
+
+- 마스터-슬레이브 복제를 지원
+  - 슬레이브가 마스터에 연결하고 전체 DB의 초기 복사본을 받는 방식
+  - 마스터에 쓰기가 수행되는 슬레이브 데이터 세트를 실시간으로 업데이트(마스터 내용 모두 슬레이브로 이동)
+
+- 쓰기 성능 증대를 위한 클라 측 샤딩을 지원
+  - 샤딩? == 파티셔닝
+  - 같은 테이블 스키마를 가진 데이터를 다수의 DB에 분산해서 저장하는 방법
+- 다양한 데이터형 제공
+  - Hash, Set, List, String, Sorted Set
+
+### Redis 장점
+
+- 리스트, 배열과 같은 데이터 처리에 용이
+- 리스트형 데이터 입력과 삭제가 MySQL대비 10배 빠르다고 한다
+- Redis Server는 1개의 싱글 쓰레드로 수행됨, 따라서 서버 하나에 여러개 레디스 서버 띄우기 가능
+- 스냅샷 기능을 이용해서 메모리의 내용을 디스크에 저장해서 추후에 복구 가능
+
+
 
 ## JSON Web Token(JWT)이란?
 
@@ -166,4 +322,21 @@
 
 ## 쿼리 튜닝 방식
 
-- https://cornswrold.tistory.com/87
+### 가급적 Where문에서는 인덱스 컬럼 사용
+
+- 인덱스를 만들어 놓아도 Where 조건을 어떻게 명시하냐에 따라서 인덱스 사용 or 미사용할 수도
+- COLUMN_B, COLUMN_A를 묶어서 INDEX_A로 해놓을떄 두 컬럼을 모두 Where안에서 사용해야 INDEX_A가 사용된다
+
+### 인덱스 컬럼에 사용하는 연산자는 최대한 동등 연산
+
+- LIKE와 같은 연산을 사용하면 인덱스 효율 떨어진다
+
+### OR 보다는 AND를 사용하자
+
+- OR의 처리는 OR 연산자로 연결된 쿼리를 UNION ALL로 변환한다
+
+### 그루핑 쿼리를 사용할 경우 가급적 HAVING 보다는 WHERE절에서 조건 처리하자
+
+- 그루핑 쿼리 처리 순서는 WHERE가 먼저 처리되므로 가급적 필터링은 WHERE에서
+- HAVING 절은 이미 WHERE절에서 처리된 로우들을 대상으로 조건을 걸기에 비교적 좋은 방법이 아니다
+
