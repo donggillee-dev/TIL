@@ -480,7 +480,7 @@ public void inorder(Node p) {
 
 - 특정 노드간의 연결 여부를 확인하기 위해서는 O(V)만큼 탐색해야함
 
-**그래프와 노드의 차이**
+**그래프와 트리의 차이**
 
 ![](https://user-images.githubusercontent.com/55429912/121016900-aaa88900-c7d7-11eb-97ae-1cb30aeddd29.png)
 
@@ -536,11 +536,18 @@ public void inorder(Node p) {
 
   - Collision 발생시 다른 버킷에 해당 자료를 삽입하는 방식. 즉, 데이터를 저장할 위치를 탐색해야함
 
-  - Linear Probing : 순차적으로 비어있는 버킷 탐색
+  - Linear Probing
 
-  - Quadratic Probing : 2차 함수를 이용해 탐색
+    - 현재 버킷의 index로부터 고정폭만큼 순차적으로 이동해 비어있는 버킷 탐색해 저장
 
-  - Double hashing Probing : 하나의 해쉬 함수에서 충돌이 일어나면 2차 해쉬 함수를 이용해 새로이 할당. 위 두가지 방법보다 더 많은 연산량 요구
+  - Quadratic Probing
+
+    - 해시의 저장순서 폭을 제곱으로 늘려가는 방식(1, 4, 9, ...)
+
+  - Double hashing Probing
+
+    - 1차 해시 함수 => 버킷의 index를 얻기 위한 함수
+    - 2차 해시 함수 => 충돌 발생시 탐색 이동 폭을 얻기 위해 사용
 
   - **삭제 처리**
 
