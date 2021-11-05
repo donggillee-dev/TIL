@@ -1,6 +1,6 @@
 # Sorting Algorithm
 
-- [Sorting Algorithm Time Complexity](sorting-algorithm-time-complexity)
+- [Sorting Algorithm Time Complexity](#sorting-algorithm-time-complexity)
 
 - [Bubble Sort](bubble-sort(버블-정렬))
 - [Quick Sort](quick-sort(퀵-정렬))
