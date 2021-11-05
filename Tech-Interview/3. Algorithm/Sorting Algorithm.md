@@ -1,7 +1,7 @@
 # Sorting Algorithm
 
 - [Sorting Algorithm Time Complexity](#sorting-algorithm-time-complexity)
-- [Bubble Sort](#bubble-sort(버블-정렬))
+- [Bubble Sort](#bubble-sort)
 - [Quick Sort](#quick-sort(퀵-정렬))
 - [Heap Sort](#heap-sort(힙-정렬))
 - [Merge Sort](#merge-sort(합병-정렬))
