@@ -560,8 +560,10 @@ public void inorder(Node p) {
     이를 위해 index 2를 삭제하고 그 위치에 Dummy node를 삽입
     
     Dummy Node는 실제 값을 가지지 않으며 다음 index를 연결해주는 역할을 한다
+    
+    Dummy Node가 많아지게 되면 성능 저하가 일어나므로 새로운 버킷을 생성하여 데이터 리빌딩을 해주어야 한다
     ```
-
+    
     
 
 - **Seperate Chaining (분리 연결법)**
