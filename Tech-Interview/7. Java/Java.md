@@ -1246,20 +1246,18 @@ public class Main {
 
 > HashMap을 확장한 클래스, HashMap과 다르게 입려된 자료들의 순서를 기억한다
 
-## Java 버전 특징
 
-### Java 8
 
-### Optional
+## Optional
 
 `Java 8부터 지원하는 클래스`
 
-#### NPE(NullPointerException)
+### NPE(NullPointerException)
 
 - 개발할 때 가장 많이 발생하는 예외 중 하나
 - 이를 회피하기 위해 null 검사 로직 추가 필요
 
-#### Optional?
+### Optional?
 
 - NPE를 방지할 수 있도록 도와주는 클래스
 - Optional<T>는 null이 올 수 있는 값을 감싸주는 Wrapper 클래스
@@ -1273,9 +1271,9 @@ public final class Optional<T> {
 }
 ```
 
-#### Optional 활용
+### Optional 활용
 
-##### 생성
+#### 생성
 
 - Wrapper 클래스이기에 빈 값이 올 수도 있음
 
@@ -1298,7 +1296,7 @@ public final class Optional<T> {
   String name = optional.orElse("anonymous"); //값이 없다면 anonymous 리턴
   ```
 
-##### 사용
+#### 사용
 
 - null인 경우 새로운 객체를 생성해줘야하는 경우에는 복잡했었는데 람다와  Optional<T>를 통해 간소화
 
@@ -1311,7 +1309,7 @@ public final class Optional<T> {
   List<String> names = Optional.ofNullable(getNames()).orElseGet(() -> new ArrayList<>());
   ```
 
-#### Optional 정리
+### Optional 정리
 
 - null 또는 실제 값을 value로 갖는 Wrapper로 감싸 NPE로부터 자유로워지기 위한 Wrapper Class
 - 하지만 값을 Wrapper하고 다시 풀고, null인 경우에는 대체 함수를 호출하는 오버헤드가 있으므로 성능 저하 가능
@@ -1319,40 +1317,92 @@ public final class Optional<T> {
 
 ### Optional의 orElse와 orElseGet의 차이
 
+> Optional에 존재하는 단말 연산 두가지
+>
+> orElse : Optional 안의 값이 null이든 아니든 항상 호출
+>
+> orElseGet : Optional 안의 값이 null인 경우에만 호출
+
+#### orElse와 orElseGet 오용에 의한 오류
+
+- orElse를 무분별하게 사용하게 되면 존재하는 값이 다른 값으로 뒤덮이게 될 수 있다
+- 또한, orElse는 orElseGet보다 비용이 크므로 최대한 사용을 자제하여야 한다
+
+### 정리
+
+- orElse
+  - Optional의 값이 null이든 아니든 항상 호출된다
+  - 그에 따른 비용이 추가적으로 발생, 문제 발생 가능
+  - 값이 미리 존재하는 경우에 사용
+- orElseGet
+  - Optional의 값이 null인 경우에만 호출된다
+  - 비용이 orElse보다 저렴해 불필요한 문제가 발생하지 않음
+  - 값이 미리 존재하지 않는 거의 대부분의 경우에 orElseGet을 사용하면 된다
 
 
 
-
-#### lambda expression(람다 표현식)
+## lambda expression(람다 표현식)
 
 `메소드를 하나의 식으로 표현하는 방식`
 
-특징
+### 특징
 
 - 메소드의 이름이 필요없다 => 익명 함수라고도 불림
 - 람다식 내에서 사용되는 지역변수는 `final`이 붙지 않아도 상수로 간주
 - 람다식으로 선언된 변수명은 다른 변수명과 중복 불가능
 
-
-
-장점
+### 장점
 
 - 코드를 간결하게 만들어 가독성 좋아짐
 - 함수식에 개발자의 의도가 명확히 드러남
 - 함수를 만드는 과정 없이 한번에 처리할 수 있어 생산성 향상
 
-
-
-단점
+### 단점
 
 - 람다를 사용하면서 만든 무명함수는 재사용 불가
 - 디버깅 어려움
 - 재귀로 만들경우 부적합
 
+### 함수형 인터페이스
 
+- Java는 기본적으로 객체지향 언어, 순수 함수와 일반 함수를 다르게 취급
 
+- 이를 구분하기 위해서 함수형 인터페이스가 존재
 
+  > 함수를 1급 객체처럼 다룰 수 있게 해주는 어노테이션
+  > 인터페이스에 선언하여 단 하나의 추상 메소드만을 갖도록 제한하는 역할
 
-#### stream api
+```java
+public class Lambda {
+  public static void main(String[] args) {
+    System.out.println(new MyLambdaFunction(){
+      public int max(int a, int b) {
+        return a > b ? a : b;
+      }
+    }.max(1,3));
+  }
+}
+```
 
-#### 
+기존의 방식이 이와 같았다면 함수형 인터페이스 사용을 통해 아래와 같이 변경할 수 있다
+
+```java
+@FunctionalInterface
+interface MyLambdaFunction {
+  int max(int a, int b);
+}
+
+public class Lambda {
+  public static void main(String[] args) {
+    MyLambdaFunction lambdaFunction = (int a, int b) -> a > b ? a : b;
+    System.out.println(lambdaFunction.max(1, 3));
+  }
+}
+```
+
+### Java에서 제공하는 함수형 인터페이스
+
+- Supplier<T>
+- Consumer<T>
+- Function<T>
+- Predicate<T>
