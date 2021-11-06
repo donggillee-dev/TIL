@@ -7,26 +7,17 @@
 - [JDK, JRE](#jdk,-jre)
 - [Java의 장단점](#java의-장단점)
 - [Java의 데이터](#java의-데이터)
-
 - [Call By Value & Call By Reference](#call-by-value-&-call-by-reference)
-
 - [String / new String](string-/-new-string)
-
 - [String, StringBuilder, StringBuffer](#string,-stringbuilder,-stringbuffer)
-
 - [클래스, 객체, 인스턴스](#클래스,-객체,-인스턴스)
-
 - [오버로딩과 오버라이딩](#오버로딩과-오버라이딩)
-
 - [인터페이스와 추상클래스](#인터페이스와-추상클래스)
-
 - [Reflection](#reflection)
-
 - [Stream](#stream)
-
 - [HashMap vs HashTable](#HashMap-vs-HashTable)
-
 - [HashSet vs TreeSet](#hashset-vs-treeset)
+- [Java 버전 특징](#java-버전-특징)
 
 
 
@@ -1255,3 +1246,113 @@ public class Main {
 
 > HashMap을 확장한 클래스, HashMap과 다르게 입려된 자료들의 순서를 기억한다
 
+## Java 버전 특징
+
+### Java 8
+
+### Optional
+
+`Java 8부터 지원하는 클래스`
+
+#### NPE(NullPointerException)
+
+- 개발할 때 가장 많이 발생하는 예외 중 하나
+- 이를 회피하기 위해 null 검사 로직 추가 필요
+
+#### Optional?
+
+- NPE를 방지할 수 있도록 도와주는 클래스
+- Optional<T>는 null이 올 수 있는 값을 감싸주는 Wrapper 클래스
+- 아래와 같은 value에 값을 저장하기에 null이더라도 바로 NPE가 발생하지 않음
+- 또한 클래스이기에 각종 메소드를 제공해준다
+
+```java
+public final class Optional<T> {
+  //If non-null,the value
+  private final T value;
+}
+```
+
+#### Optional 활용
+
+##### 생성
+
+- Wrapper 클래스이기에 빈 값이 올 수도 있음
+
+- 아래와 같이 생성
+
+  ```java
+  Optional<String> optional = Optional.empty();
+  
+  System.out.println(optional.isPresent()); //false
+  ```
+
+
+
+- Null이 올 수도 있을 데이터를 감싸서 생성 가능
+
+- 그리고 orElse 또는 orElseGet 메소드를 이용해 값이 없는 경우라도 안전하게 값을 가져올 수 있다
+
+  ```java
+  Optional<String> optional = Optional.ofNullable(getName());
+  String name = optional.orElse("anonymous"); //값이 없다면 anonymous 리턴
+  ```
+
+##### 사용
+
+- null인 경우 새로운 객체를 생성해줘야하는 경우에는 복잡했었는데 람다와  Optional<T>를 통해 간소화
+
+  ```java
+  //Java 8 이전
+  List<String> names = getNames();
+  List<String> tmpNames = list != null ? list : new ArrayList<>();
+  
+  //이후
+  List<String> names = Optional.ofNullable(getNames()).orElseGet(() -> new ArrayList<>());
+  ```
+
+#### Optional 정리
+
+- null 또는 실제 값을 value로 갖는 Wrapper로 감싸 NPE로부터 자유로워지기 위한 Wrapper Class
+- 하지만 값을 Wrapper하고 다시 풀고, null인 경우에는 대체 함수를 호출하는 오버헤드가 있으므로 성능 저하 가능
+- 따라서 메소드의 반환 값이 절대 null이 아니라면 사용하지 말자
+
+### Optional의 orElse와 orElseGet의 차이
+
+
+
+
+
+#### lambda expression(람다 표현식)
+
+`메소드를 하나의 식으로 표현하는 방식`
+
+특징
+
+- 메소드의 이름이 필요없다 => 익명 함수라고도 불림
+- 람다식 내에서 사용되는 지역변수는 `final`이 붙지 않아도 상수로 간주
+- 람다식으로 선언된 변수명은 다른 변수명과 중복 불가능
+
+
+
+장점
+
+- 코드를 간결하게 만들어 가독성 좋아짐
+- 함수식에 개발자의 의도가 명확히 드러남
+- 함수를 만드는 과정 없이 한번에 처리할 수 있어 생산성 향상
+
+
+
+단점
+
+- 람다를 사용하면서 만든 무명함수는 재사용 불가
+- 디버깅 어려움
+- 재귀로 만들경우 부적합
+
+
+
+
+
+#### stream api
+
+#### 
