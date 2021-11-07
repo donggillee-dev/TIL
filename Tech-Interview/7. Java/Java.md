@@ -1250,7 +1250,7 @@ public class Main {
 
 ## Optional
 
-`Java 8부터 지원하는 클래스`
+> Java 8부터 지원하는 클래스
 
 ### NPE(NullPointerException)
 
@@ -1343,7 +1343,7 @@ public final class Optional<T> {
 
 ## lambda expression(람다 표현식)
 
-`메소드를 하나의 식으로 표현하는 방식`
+> 메소드를 하나의 식으로 표현하는 방식
 
 ### 특징
 
@@ -1400,9 +1400,3 @@ public class Lambda {
 }
 ```
 
-### Java에서 제공하는 함수형 인터페이스
-
-- Supplier<T>
-- Consumer<T>
-- Function<T>
-- Predicate<T>
