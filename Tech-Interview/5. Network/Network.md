@@ -726,3 +726,70 @@ IO 진행시간과 관계가 없기에 작업을 중지하지 않고도 IO 가�
 3. 2의 과정을 통해 외부와 통신 준비 마친 뒤, DNS Query를 DNS 서버에 송신. 이 결과로 웹 서버의 IP를 요청 PC에 돌려줌
 4. HTTP Request를 위해 TCP 소켓을 개발하고 연결(3-way handshake)
 5. 이에 대한 응답으로 웹 페이지가 사용자의 PC로 들어옴
+
+## Web Server, WAS의 차이
+
+### Static Pages와 Dynamic Pages
+
+<img src="https://user-images.githubusercontent.com/41468004/140633545-9d5d1af9-cb50-4ff6-ba04-ecb5e2835c4a.png" style="zoom:50%;" />
+
+1. Static Pages
+   - Web Server는 파일 경로 이름을 받아 경로와 일치하는 file content를 반환
+   - 항상 동일한 내용을 반환한다
+   - html, css, js와 같은 파일
+2. Dynamic Pages
+   - 인자의 내용에 맞게 동적인 contents를 제작해 반환한다
+
+### Web Server와 WAS의 차이
+
+<img src="https://user-images.githubusercontent.com/41468004/140633557-c16582b3-cb0f-4757-8e14-cfc285037185.png" style="zoom:50%;" />
+
+#### Web Server
+
+- Web Server?
+  - 소프트웨어와 하드웨어로 구분
+  - 하드웨어 : Web Server가 설치되어 있는 컴퓨터
+  - 소프트웨어 : 정적인 파일(html, css, js, image, ...)을 제공해주는 프로그램
+- Web Server의 기능
+  - HTTP 요청을 받아 원하는 서비스를 제공하는 기능
+  - 정적인 콘텐츠 요청
+    - WAS를 거치지 않고 바로 제공
+  - 동적인 콘텐츠 요청
+    - 동적인 콘텐츠를 위한 요청 전달
+    - 클라의 요청을 WAS에게 전달, WAS로 부터 받은 결과를 클라에게 넘겨줌
+- Apache Server, Nginx 등이 대표적이다
+
+#### WAS(Web Application Server)
+
+> DB 조회나 다양한 로직 처리를 요구하는 동적인 콘텐츠를 제공하기 위해서 만들어진 Application Server
+>
+> Web Container, Servlet Container라고 불리기도 한다
+
+- WAS의 역할
+  - Web Server + Container
+- 주요 기능
+  - 프로그램 실행 및 DB 접속 기능 제공
+  - 여러 트랜잭션 관리 기능
+  - 비즈니스 로직 수행
+- Tomcat, JBoss, JEUS등이 대표적
+
+### Web Server, WAS를 구분하는 이유?
+
+##### Web Server 왜?
+
+- 클라에게 정적 파일을 보내는 과정
+  - html이 먼저 보내지고 거기서 필요한 이미지들 요청
+  - 해당 정적 파일들은 Application Server까지 가지 않고도 Web Server를 통해 앞단에서 빠르게 처리 가능
+- 정적 컨텐츠만 처리하도록 기능을 분배해 서버의 부담 줄일 수 있음
+
+##### WAS의 필요성
+
+- 웹 페이지는 동적, 정적 두가지 존재
+- 동적 컨텐츠는 사용자의 요청에 맞게 처리
+  - 만약 Web Server에서 이를 다 처리하기에는 모든 경우의 수에 알맞게 결과값을 미리 다 만들어놓아야 한다
+- 따라서 WAS를 사용하면 그때그때 요청에 맞는 결과를 생성해 클라에게 제공할 수 있음
+
+##### WAS가 Web Server의 기능을 모두 수행하면 안되나?
+
+- WAS는 DB 조회나 비즈니스 로직 처리 등 복잡한 행동을 많이 한다 그렇기에 단순히 전달만 하면되는 정적인 콘텐츠들은 Web Server에게 일임
+- 이로써 부하를 방지해 수행 속도를 향상시킴
