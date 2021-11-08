@@ -346,9 +346,140 @@ public class Controller {
 
 ### DI의 3가지 방법
 
-- Constructor Injection: 생성자에서 주입
-- Method Setter: 메소드 매개변수 주입
-- Field Injection: 멤버 변수 삽입
+1. Constructor Injection
+   `Autowired 사용 방식`
+
+   ```java
+   @Component
+   public class JackCoding {
+     private final Jack jack;
+     private final Soy soy;
+     
+     @Autowired //Spring 4.3부터 단일 생성자는 @Autowired 표기 불필요
+     public JackCoding(Jack jack, Soy soy) {
+       this.jack = jack;
+       this.soy = soy;
+     }
+   }
+   ```
+
+   `Lombok을 이용한 방식`
+
+   ```java
+   @Component
+   @RequiredArgsConstructor
+   public class JackCoding {
+     private final Jack jack;
+     private final Soy soy;
+   }
+   ```
+
+   - @RequiredArgsConstructor 어노테이션은 `final`이나 `@NotNull`을 사용한 필드에 대한 생성자를 자동으로 생성
+
+   
+
+2. Field Injection
+   `가장 널리 사용되는 방식이며 @Autowired를 이용`
+
+   ```java
+   @Component
+   public class JackCoding {
+     @Autowired
+     private Jack jack;
+     
+   }
+   ```
+
+   - 생성자 주입과 다르게 필드에 final 정의 불가
+
+   
+
+3. Setter Injection
+
+   ```java
+   @Component
+   public class JackCoding {
+     private Jack jack;
+     
+     @Autowired
+     public void JackCoding(Jack jack) [
+       this.jack = jack;
+     ]
+   }
+   ```
+
+   - 이 방식도 final 선언 불가
+
+### Constructor Injection을 권장하는 이유
+
+#### 1. 순환 참조 사전 방지
+
+- 객체의 의존성 추가하다보면 A -> B, B -> A와 같은 참조가 생성될 수 있다
+
+  ```java
+  @Component
+  public class Jack {
+    @Autowired
+    private Coding coding;
+    
+    public void jack() {
+      coding.coding();
+    }
+  }
+  
+  @Component
+  public class Coding {
+    @Autowired
+    private Jack jack;
+    
+    public void coding() {
+      jack.jack();
+    }
+  }
+  
+  @Component
+  public class JackCoding {
+    @Autowired
+    private Jack jack;
+    
+    @Autowired
+    private Coding coding;
+    
+    public void jackCoding() {
+      jack.jack();
+      coding.coding();
+    }
+  }
+  ```
+
+  - 이 상태에서 서버 구동하면 잘됨
+  - but jackCoding()메서드가 실행되는 순간 순환참조로 인해 서버가 죽는다
+  - `즉, 메소드 실행 이전까지 순환 참조를 알아차릴 수 없음`
+
+  똑같이 생성자 주입 방식 채택해보자
+
+  - 아마 서버가 실행되기도 이전에 에러가 발생할 것
+  - `즉, 서버 자체가 구동되지 않으므로 바로 순환 참조를 알아차릴 수 있다`
+
+- 이러한 차이가 생기는 핵심?
+
+  - 빈을 주입하는 순서의 차이
+  - 필드 주입, setter 주입은 우선 빈을 생성한 후 해당 빈에 주입해야 하는 빈을 찾는다
+  - 생성자 주입은 주입해야하는 빈을 먼저 찾은 후 빈을 생성한다
+  - 그렇기에 사전에 순환 참조 오류를 방지할 수 있다
+
+
+
+#### 2. final 선언 가능
+
+- final로 주입해야 하는 빈에 대한 불변성을 보장해준다
+- 즉, 런타임에 객체의 불변성을 보장해준다
+
+
+
+#### 3. 테스트 코드 작성 용이
+
+- Mockito 같은것을 이용할 필요 없이 단순히 원하는 객체 생성 후 생성자에 넣어주면 됨
 
 
 
@@ -456,3 +587,261 @@ public class Controller {
 
 - Interceptor와 달리 AOP는 메소드 전 후 지점에 자유롭게 호출 가능
 - Interceptor는 주소로 대상을 구분해서 걸러내야하는데, AOP는 주소/파라미터/어노테이션 등 다양한 방법으로 대상 지정할 수 있다
+
+
+
+## @Controller(Spring MVC Controller)
+
+> Spring에서의 Controller는 @Controller, @RestController 두가지 존재
+>
+> 가장 큰 차이점은 HTTP Response Body가 생성되는 방식
+
+### Controller - View
+
+`View를 반환하기 위해 사용`
+
+<img src="https://user-images.githubusercontent.com/41468004/140636627-998714ce-b73a-4c15-8d83-8baecbfb8fe7.png" style="zoom:50%;" />
+
+> 1. Client측의 URI를 통한 서비스 요청
+> 2. DispatcherServlet에 의해 요청 가로채진다
+> 3. Handler Mapping을 통해 적절한 Controller 매치
+> 4. Controller의 처리 완료 후 적절한 View를 찾기 위해 View Resolver로 View 요청
+> 5. 전달받은 View에 데이터를 적절히 바인딩 하여 결과 View를 Client로 전달
+
+### Controller - Data
+
+`@Controller에서 Data를 반환해야하는 경우에 사용`
+
+<img src="https://user-images.githubusercontent.com/41468004/140636720-cc253f29-e9c9-47a3-ad1b-3fbec27c7d9b.png" style="zoom:50%;" />
+
+> 1. Client의 요청
+> 2. DispatcherServlet의 요청 수신
+> 3. Handler Mapping을 통한 적절한 Controller
+> 4. Controller에서 @ResponseBody를 사용
+> 5. Json형태로 Client에게 데이터 전달
+
+- 여기서 ViewResolver 대신에 `HttpMessageConverter`가 동작
+- HttpMessageConverter에는 여러 `Converter`가 등록되어 있으며 반환해야하는 데이터에 따라 사용되는 Converter가 다르다
+- `HTTP Accept 헤더`와 `서버의 컨트롤러 반환 타입` 이 둘을 조합해 적합한 HttpMessageConverter를 선택한다
+
+### Controller Code
+
+```java
+@Controller
+@RequestMapping("/user")
+@RequiredArgsConstructor
+public class UserController {
+  private final UserService userService;
+  
+  //Data 반환
+  @PostMapping("value = /info")
+  public @ResponseBody User info(@RequestBody User user) {
+    return userService.retrieveUserInfo(user);
+  }
+  
+  //View 반환
+  @GetMapping("value = /infoView")
+  public String infoView(
+    Model model, 
+    @RequestParam(value = "userName", required = true) String userName
+  ) {
+    User user = userService.retrieveUserInfo(userName);
+    model.addAttiribute("user", user);
+    
+    return "/user/userInfoView";
+  }
+}
+```
+
+
+
+### @RestController(Spring Rest Controller)
+
+`Json 형태로 객체 데이터를 반환하기 위한 용도`
+
+<img src="https://user-images.githubusercontent.com/41468004/140637088-e9d1f8da-ca36-4a0a-9e62-69055929f7a9.png" style="zoom:50%;" />
+
+> 1. Client의 서비스 요청
+> 2. DispatcherServlet -> Handler Mappging에 의해 적절한 Controller반환
+> 3. RestController는 그 요청을 처리하고 적절한 데이터를 반환(JSON)
+
+```java
+@RestController
+@RequsetMapping("/user")
+@RequiredArgsConstructor
+public class UserController {
+  private final UserService userService;
+  
+  @PostMapping(value = "/info")
+  public ResponseEntity<User> info(
+    @RequestParam(value = "userName", required = true) String userName
+  ) {
+    return Optional.ofNullable(userService.retrieveUserInfo(userName))
+      .map(user -> ResponseEntity.ok(user))
+      .orElseGet(() -> ResponseEntity.noContent().build());
+  }
+}
+```
+
+
+
+## Transaction
+
+> 단일 쿼리로 해결할 수 없는 로직을 처리할 때 필요한 개념
+>
+> 더 이상 쪼갤 수 없는 최소 작업 단위를 의미한다
+
+### Transaction의 필요성
+
+- 여러 작업을 진행하다가 문제가 생겼을 시 이전 상태로 롤백하기 위해 사용되는 것이 Transaction
+- 트랜잭션 커밋 : 작업이 마무리 되었다
+- 트랜잭션 롤백 : 작업을 취소하고 이전 상태로 되돌린다
+
+- 하나의 트랜잭션 안에 여러 작업 처리중
+  - 잘 처리되었다면 커밋으로 변경내용 반영
+  - 제대로 처리 안되었다면 작업들의 변경내용 이전으로 되돌림
+
+### Spring이 제공하는 Transaction 핵심 기술
+
+#### 1. Transaction 동기화
+
+- 여러 작업을 하나의 트랜잭션으로 쉽게 관리하기 위한 기술
+
+- 트랜잭션을 시작하기 위한 Connection 객체를 어딘가에 저장해놓고 필요할때마다 꺼내서 사용하는 기술이다
+
+- 작업 쓰레드마다 독립적인 Connection을 꺼내서 사용하기에 충돌 없다
+
+  > JDBC가 아닌 Hibernate에서는 Connection이 아니라 Session
+  >
+  > Connection
+  >
+  > - DB와의 물리적인 연결 단위
+  >
+  > Session
+  >
+  > - 하나의 Session안에 Connection이 포함되어있다
+  > - 1차 캐시를 사용한다
+
+#### 2. Transaction 추상화
+
+<img src="https://user-images.githubusercontent.com/41468004/140641111-7926c5bc-eb04-4660-ad6e-40f0dde4ba2b.png" style="zoom:50%;" />
+
+- 1에서의 기술적인 종속성(Connection, Session)을 해결하기 위해 제공하는 기술
+- 트랜잭션 기술의 공통점을 담은 추상화 기술
+- 각 기술(JDBC, JPA, Hibernate)마다 종속적인 코드를 작성하지 않고 일관되게 트랜잭션 처리할 수 있게 해줌
+
+#### 3. AOP를 이용한 트랜잭션 분리
+
+- 2에서의 비즈니스 로직 + 트랜잭션 로직 중첩 현상을 분리하기 위해 AOP 이용
+- 트랜잭션 관리 코드를 밖으로 빼낸것 같이 동작하게끔 `@Transactional` 제공
+
+### Spring Transaction 세부 설정
+
+> 트랜잭션에 대해서 4가지 속성을 적용함으로써 트랜잭션을 세부적으로 이용할 수 있게
+>
+> - 트랜잭션 전파
+> - 격리수준
+> - 제한시간
+> - 읽기전용
+
+#### 트랜잭션 전파(PROPAGATION)
+
+`트랜잭션간의 경계에서 이미 진행중인 트랜잭션이 있거나 없을시 어떻게 동작할지 명시해주는 것`
+
+1. A의 트랜잭션에 참여(PROPAGATION REQUIRED)
+   - B의 코드는 새로운 트랜잭션 생성 x, A의 트랜잭션에 참여
+   - B의 작업이 모두 마무리 되고 난 후 A처리
+     - A 처리시에 오류 발생하면 B작업까지 취소 => 둘 다 하나의 트랜잭션으로 묶여있기 때문
+2. 독립적인 트랜잭션 생성(PROPAGATION REQUIRES NEW)
+   - B의 트랜잭션은 A 트랜잭션과 무관하게 생성 가능
+   - B의 트랜잭션 경계를 빠져나오는 순간 B의 트랜잭션은 독자적으로 커밋 or 롤백되며 A에게 영향을 끼치지 않는다
+3. 트랜잭션 생성 없이 동작(PROPAGATION NOT SUPPORTED)
+   - B의 작업에 대해 트랜잭션 생성 X
+   - 단순히 조회인 경우에
+
+#### 격리수준(Isolation)
+
+- 모든 Transaction은 격리수준을 가지고 있어야한다
+- 모든 트랜잭션을 독립시키고 순차 진행하면 안정하지만 성능 떨어진다
+- 따라서 적절한 격리수준을 줌으로서 적절히 동시에 진행 + 문제 발생 안하게
+
+#### 제한시간
+
+- 트랜잭션 수행하는데 제한시간을 줄 수 있다
+
+#### 읽기전용
+
+- 읽기전용으로 함으로써 데이터의 조작을 막을 수 있다
+
+### Spring 트랜잭션의 세부 설정
+
+#### 전파 속성(Propagation)
+
+1. REQUIRED
+   - Default 속성, 보통 이 속성이면 다 된다
+   - 미리 시작된 트랜잭션이 존재하면 참여하고 없으면 새로 시작
+2. SUPPORTS
+   - 이미 시작된 트랜잭션이 있으면 참여, 그렇지 않으면 없이 진행
+3. MANDATORY
+   - 이미 시작된 트랜잭션이 있으면 참여, 그렇지 않으면 새로 시작 + 예외 발생
+4. REQUIRES_NEW
+   - 항상 새로운 트랜잭션을 시작해야 하는 경우
+   - 이미 시작된 트랜잭션이 있다면 트랜잭션을 잠시 보류
+5. NOT_SUPPORTED
+   - 이미 진행중인 트랜잭션이 있으면 이를 보류, 트랜잭션 사용 X
+6. NEVER
+   - 이미 진행중인 트랜잭션이 있으면 예외 발생, 트랜잭션 사용 X 강제
+7. NESTED
+   - 이미 진행중인 트랜잭션이 있으면 중첩 트랜잭션 시작
+   - 트랜잭션 안에 서브 트랜잭션을 만드는 것, 독립적인 트랜잭션을 만드는 REQUIRES_NEW와는 다르다
+   - 서브 트랜잭션은 부모 트랜잭션의 롤백, 커밋에 영향 O
+   - 서브 트랜잭션의 커밋, 롤백은 부모 트랜잭션에게 영향 X
+
+#### 격리 수준(Isolation)
+
+`동시 여러 트랜잭션 진행시 각 트랜잭션의 작업 결과를 다른 트랜잭션에게 어떻게 노출시킬지 결정`
+
+1. DEFAULT
+   - DB 드라이버의 디폴트 설정을 따른다
+2. READ_UNCOMMITED
+   - 가장 낮은 격리수준
+   - 하나의 트랜잭션이 커밋되기 이전에 그 변화가 다른 트랜잭션에 그대로 노출
+3. READ_COMMITED
+   - 가장 많이 사용되는 격리수준
+   - 다른 트랜잭션이 커밋하지 않은 정보는 읽을 수 없음
+   - 대신 하나의 트랜잭션이 읽은 로우를 다른 트랜잭션이 수정 가능
+4. REPEATABLE_READ
+   - 하나의 트랜잭션이 읽은 로우를 다른 트랜잭션이 수정할 수 없도록 막는다
+   - 하지만 새로운 로우 추가는 막지 않음
+   - 따라서, 트랜잭션이 끝나기 전에 추가된 로우가 발견될 수 있음
+5. SERIALIZABLE
+   - 가장 강력한 격리수준
+   - 모든 트랜잭션을 순차적으로 진행
+
+#### 읽기 전용(readOnly)
+
+- 읽기 전용으로 설정, 성능 최적화
+- 쓰기 작업이 일어나는 것을 의도적으로 방지
+
+#### 롤백/커밋 예외
+
+- 런타임 예외 발생하면 롤백
+- 예외가 발생하지 않거나 체크 예외가 발생하면 커밋
+
+#### 제한 시간(timeout)
+
+- 트랜잭션에 제한시간 지정
+- 별도 값을 지정하지 않으면 트랜잭션 시스템의 default 시간을 따른다
+
+### Spring에서 트랜잭션 사용법
+
+#### @Transactional
+
+- 이를 명시해준 곳은 포인트 컷의 대상으로 자동 등록되며 트랜잭션 관리 대상이 된다 ( AOP 적용 )
+- 즉, 포인트 컷에 등록하고 트랜잭션 속성을 부여하는 것이다
+- 이 어노테이션 적용 시
+  - 타깃 메소드 -> 타깃 클래스 -> 선언 메소드 -> 선언 타입(클래스 or 인터페이스) 순으로 @Transactional이 적용되었는지 차례로 확인
+
+- 보통 비즈니스 로직을 담고 있는 서비스 계층의 메소드와 결합
+  - 일반적으로 데이터를 읽어오고 사용하고 변경하고 등의 작업을 하는 곳이 대부분 Service Layer이기 때문
+  - 서비스 클래스의 상단에 @Transactional해주면 그 안의 모든 메소드가 트랜잭션 관리 대상이 된다

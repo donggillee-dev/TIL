@@ -97,7 +97,92 @@ DBMS는 인덱스를 어떻게 관리하나?
 - SELECT 질의에는 부등호(<>)연산도 포함이 됨
 - 이 부등호 연산을 Hash에서는 불가능
 
+### Simple Indexes(Primary Indexes)
 
+`정렬되어있는 파일에 대한 간단한 인덱스`
+
+#### Indexes on Sequential Files
+
+> 정렬된 파일은 Data file에게 Key-Pointer 쌍을 가지고 있는 Index file이 주어짐
+>
+> Index file안의 Search Key K는 Data file을 참조하고 있는 포인터와 연관이 있음
+>
+> - Dense Index : Data File의 모든 레코드 항목이 존재하는 인덱스
+> - Sparse Index : 몇몇 Data Record에 대해서만 표현되는 인덱스 구조, 보통 파일 or 블록당 하나의 매치
+
+#### Sequential Files
+
+`Index의 컬럼에 의해 정렬되는 파일`
+
+- 보통 이러한 구조는 Search Key가 릴레이션의 PK일때 유용
+
+<img src="https://user-images.githubusercontent.com/41468004/140704730-0e887dbb-04e6-49d3-9b2c-faeb30afbbeb.png" alt="image" style="zoom:50%;" />
+
+#### Dense Index
+
+`모든 키가 인덱스에 표현되어진 밀집이기에 Dense`
+
+- Key와 레코드 자체에 대한 포인터만 보유하는 블록의 나열
+- 키와 포인터만 보유한 인덱스, 파일 자체보다 훨씬 적은 공간을 소모
+- 1번의 접근 -> 1번의 Disk I/O로 원하는 레코드를 찾을 수 있음 
+
+<img src="https://user-images.githubusercontent.com/41468004/140705258-85cfc052-e537-48c3-9ca0-cd56ad2d43d6.png" alt="image" style="zoom:50%;" />
+
+- Dense Index는 원하는 값 K를 찾을때까지 탐색해야함 (평균적으로는 절반)
+- 성능이 별로인거같은데 다음과 같은 이유로 좋다
+  - 키값이 정렬되어있기에 이진탐색 가능
+  - 인덱스는 메인 메모리에 저장할 수 있을만큼 작다 => Disk I/O 수행이 필요 없음
+
+#### Sparse Index
+
+`데이터 블록마다 오직 한개의 Key-Pointer 쌍을 보유한다`
+
+- Dense Index는 모든 데이터 블록에 대한 저장을 하기에 비교적 큼
+- Sparse는 그에 비해 훨씬 적은 공간을 사용하지만 탐색하는데 더 비용이 많이 든다
+- Sparse는 해당 블록에 K가 있을지도 모르니 disk I/O를 해야한다
+
+<img src="https://user-images.githubusercontent.com/41468004/140706202-d4ebc0cf-e2fd-4689-8054-2f32f3e58c97.png" alt="image" style="zoom:50%;" />
+
+- 찾으려는 K값과 작거나 같은 것들중 가장 큰 값을 찾는다
+- Dense와 마찬가지로 정렬되어있기에 이진 탐색 가능
+- 찾은 값을 통해 해당 블록으로 들어가 Disk I/O
+
+#### Multiple Level Index
+
+`인덱스를 위한 인덱스를 둠으로써 효율적으로 인덱스를 사용하는 방법`
+
+- 이진탐색으로 레코드를 찾더라도 여전히 수차례의 Disk I/O를 수행해야함
+
+- 이를 해결하기 위해 Multiple Level Index
+
+<img src="https://user-images.githubusercontent.com/41468004/140706742-fd282628-de0d-4965-93e8-8ff7d4a7e1bb.png" alt="image" style="zoom:50%;" />
+
+- 위 사진은 기존의 Sparse Index에 레벨 하나 더 추가한 것
+  - 원래의 인덱스를 First Level Index
+  - 추가한 인덱스를 Second Level Index
+- 최초의 인덱스가 아니라면 반드시 `sparse index`, 최초는 둘 다 가능
+- 하지만 이것도 한계가 존재하므로 B-Tree 구조로 빌드하는 것이 좋다
+
+### Secondary Indexes
+
+> 이전까지는 인덱스와 레코드가 직접적으로 연결되어 위치를 결정 => Primary Indexes
+>
+> 다양한 쿼리문을 유용하게 사용하기 위해 한 릴레이션에 여러 인덱스를 두고자 => Secondary Indexes
+
+- 다른 인덱스를 돕는 보조 인덱스
+- 레코드의 위치를 결정짓지 않는다, 레코드의 위치가 어딘지 알려주는 역할일뿐
+- 그러므로 보조 인덱스는 Dense Index
+  - Sparse Index는 위치에 영향을 끼치기 때문
+
+<img src="https://user-images.githubusercontent.com/41468004/140707885-a421fabe-4ab7-469c-95a3-74e535dfcc65.png" alt="image" style="zoom:50%;" />
+
+- 데이터는 정렬하지 않아도 인덱스는 정렬
+
+<img src="https://user-images.githubusercontent.com/41468004/140708273-a37af1d9-1e28-4adf-b54a-3a2a332dff03.png" alt="image" style="zoom:50%;" />
+
+- 이전 그림처럼 Secondary Index를 설계하면 공간의 낭비 발생
+- 특정 값을 가진 데이터 레코드에 대한 포인터에 대해 한번의 키 값만 사용하게끔 위 그림처럼 처리하면 효율 good
+  - Open Addressing 방식
 
 ## 정규화
 
@@ -184,20 +269,22 @@ DBMS는 인덱스를 어떻게 관리하나?
 
 > 하나의 논리적 작업 단위를 구성하는 일련의 연산들의 집합
 
-
-
-#### 특징(ACID)
+#### ACID
 
 1. 원자성(Atomicity)
    - 트랜잭션이 DB에 모두 반영되거나, 혹은 전혀 반영되지 않아야 한다.
+   - 100개의 연산으로 이루어진 트랜잭션에서 1개의 오류만 발생해도 100개는 모두 Fail처리
+   - 즉, 트랜잭션에서 중간상태는 없다
 2. 일관성(Consistency)
    - 트랜잭션의 작업 처리 결과는 항상 일관성 있어야 한다.
+   - A계좌에서 B계좌로 이체를 하기 전/후 모두 A + B 금액은 같아야한다
 3. 독립성(Isolation)
    - 둘 이상의 트랜잭션이 동시에 병행 실행되고 있을 때, 어떤 트랜잭션도 다른 트랜잭션 연산에 끼어들 수 없다.
+   - A계좌에 대한 어떤 트랜잭션이 이미 작동중이라면 다른 트랜잭션이 끼어들 수 없음
 4. 지속성(Durability)
    - 트랜잭션이 성공적으로 완료되었으면, 결과는 영구적으로 반영되어야 한다.
-
-
+   - 어떠한 치명적 오류로 인해 시스템 장애가 발생되어도 회복 후 그 데이터는 복구되어야 한다
+     - 주기억장치가 아닌 디스크, 보조기억장치에 저장하면된다
 
 #### 연산
 
@@ -209,8 +296,6 @@ DBMS는 인덱스를 어떻게 관리하나?
 
 - 하나의 트랜잭션 처리가 비정상적으로 종료되어 트랜잭션 원자성이 깨진 경우
 - 트랜잭션이 정상적으로 종료되지 않았을때, Last Consistent State로 Rollback 할 수 있음
-
-
 
 #### 상태
 
@@ -258,25 +343,143 @@ DBMS는 인덱스를 어떻게 관리하나?
    - `완벽한 읽기 일관성 모드를 제공`
      - 다른 사용자는 그 영역에 해당되는 데이터에 대한 수정 및 입력이 불가능
 
-
-
 ##### Dirty Read
 
 - 어떤 트랜잭션에서 아직 실행이 끝나지 않은 다른 트랜잭션에 의한 변경 사항을 보게 되는 경우
 
-  
 
 ##### Non-Repeatable Read
 
 - 한 트랜잭션에서 같은 쿼리를 두 번 수행할 때, 그 사이에 다른 트랜잭션이 값을 수정 또는 삭제함으로써 두 쿼리의 결과가 상이하게 나타나는 비일관성 현상
-
-
 
 ##### Phantom Read
 
 - 한 트랜잭션 안에서 일정 범위의 레코드를 두 번 이상 읽을 때, 첫 번째 쿼리에서 없는 레코드가 두 번째 레코드에서 나타나는 현상
 
 
+
+## 클러스터링, 레플리케이션, 샤딩
+
+우선 가장 기본적인 DB구조를 보자
+
+<img src="https://user-images.githubusercontent.com/41468004/140709654-8aa9e81e-e5be-4a99-9dae-796740e7b546.png" alt="image" style="zoom: 67%;" />
+
+- DB 서버와 디스크 역할을 하는 DB 스토리지가 한 구성으로 되어있음
+
+- 그런데 이 구성과 같이 운영할 경우 DB 서버가 죽으면 관련된 서비스 전체가 중단
+
+
+
+### 클러스터링(Clustering)
+
+#### Active-Active 클러스터링
+
+<img src="https://user-images.githubusercontent.com/41468004/140709901-6e868d21-dc90-4251-9317-0836e48b04cc.png" alt="image" style="zoom: 67%;" />
+
+장점
+
+- 하나의 DB 서버가 죽어도 다른 DB서버가 동작
+- 하나의 서버가 부담하던 부하를 두 개의 DB 서버가 분담하기에 CPU, Memory 부하도 적어진다
+
+단점
+
+- 하나의 DB 스토리지를 두개의 DB 서버가 공유하기에 병목 현상 발생 가능
+- 이전보다 많은 비용의 투자가 이루어져야 한다
+
+#### Active, Stand-By 클러스터링
+
+<img src="https://user-images.githubusercontent.com/41468004/140711124-6b5869f2-9d1d-4c5c-a564-a3327345cfc2.png" alt="image" style="zoom: 67%;" />
+
+장점
+
+- Active-Active의 단점을 보완하기 위한 방법
+- Active 서버의 문제 생기면 Fail Over를 통해 Active와 Stand-By를 상호 전환 => 장애 대응 가능
+
+단점
+
+- Fail Over가 이루어지는 수초~수분 간의 시간동안 영엽 손실 필연적 발생
+- 하나뿐인 스토리지에 오류가 발생하면 데이터 복구는 어떻게...?
+
+### 레플리케이션(Reflication)
+
+<img src="https://user-images.githubusercontent.com/41468004/140711617-723fedf0-59d6-4fca-b268-296e7248b817.png" alt="image" style="zoom: 67%;" />
+
+- 사용자가 Master DB에 DML(Select/Insert/Update/Delete)를 하면 Master DB는 Slave DB에 데이터 복제
+
+장점
+
+- 이를 통해 스토리지가 1개 였을때의 데이터 손실을 방지할 수 있음
+
+단점
+
+- Slave DB는 놀게된다
+- 이를 해결하기 위해 Master DB에는 Insert, Update, Delete, Slave DB에는 Select
+  - DB 서버 부하를 줄일 수 있음
+- 특정 테이블에 데이터가 엄청 많다면?
+  - Slave DB를 여러대 두더라도 특정 값을 찾기 위해서는 동일하게 오랜 시간이 걸린다
+  - 이를 해결하기 위한게 `샤딩`
+
+### 샤딩(Sharding)
+
+`테이블을 특정 기준으로 나누어 저장 및 검색하는 것`
+
+- Data를 어떻게 잘 분산시킬지, 어떻게 잘 읽을지가 핵심
+- 어떻게 잘 분산시킬지의 기준 => `Shard Key`
+  - 세 가지 방법이 존재
+  - Hash Sharding
+  - Dynamic Sharding
+  - Entity Group
+
+#### Hash Sharding
+
+<img src="https://user-images.githubusercontent.com/41468004/140712758-de469671-7ffc-44a9-a5c4-9b3d26ca9d03.png" alt="image" style="zoom:67%;" />
+
+- Shard의 수만큼 Hash 함수를 이용
+- Hash 함수의 결과에 따라 DB 서버에 저장하는 방식
+
+장점
+
+- 구현이 정말 간단
+
+단점
+
+- 확장성이 낮음
+- DB 서버가 추가될 경우 Hash Function이 변경
+  - => 기존 Shard에 들어가 있던 데이터들의 정합성이 깨짐
+
+#### Dynamic Sharding
+
+<img src="https://user-images.githubusercontent.com/41468004/140713110-6ed0fcad-8163-4cfb-b35d-75de760133ef.png" alt="image" style="zoom:67%;" />
+
+`Locator Service`
+
+- 테이블 형식의 데이터를 바탕으로 샤드를 결정
+- 그 결과를 통해 적절한 샤드에 데이터 배치
+
+장점
+
+- Hash Sharding과 달리 Locator Service에 키만 추가해주면 되기에 확장 쉽다
+
+단점
+
+- Locator Service가 단말 장애점이 될 수 있음
+- Locator Service가 장애가 발생하면 모든 샤드들에 대해 문제가 발생할 수 있다
+
+#### Entity Group
+
+<img src="https://user-images.githubusercontent.com/41468004/140713461-4ea615a7-95d0-48ef-86dc-f84ace0139d1.png" alt="image" style="zoom:67%;" />
+
+- Hash, Dynamic Sharding 둘 다 NoSQL에 최적화되어있다
+- Entity Group은 RDB에 최적화된 방식
+- `연관된 Entity Group을 한 Shard`에 두는 방식
+
+장점
+
+- 같은 Shard에 존재하는 데이터를 조회할떄는 효과적
+
+단점
+
+- 다른 Shard에 존재하는 데이터를 조회하게 될 경우에는 성능이 떨어진다
 
 ## SQL vs NoSQL
 
