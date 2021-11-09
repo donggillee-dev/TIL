@@ -143,10 +143,6 @@ public class Controller {
 
 ![](https://user-images.githubusercontent.com/41468004/137918682-e5e91907-6038-49ef-b1b8-8dde2f3d7aac.png)
 
-
-
-
-
 ## Spring Boot
 
 ### SpringApplication
@@ -169,7 +165,8 @@ public class Controller {
     - 내장 WAS를 실행
     - 개발자가 따로 톰캣과 같은 외부 WAS를 설정해주지 않아도 되므로 간단하게 어플리케이션을 실행할 수 있다
 
-    
+
+
 
 ## Spring Container
 
@@ -206,7 +203,31 @@ public class Controller {
   > - ApplicationContext 인터페이스를 구현한 클래스의 Object임
   > - 즉 ApplicationContext == IoC Container
 
-  
+
+
+
+## Application Context, Servlet Context
+
+### Application Context
+
+- `Web Application` 최상단에 위치하고 있는 `Context`
+- `Spring Container`중 하나이며 `BeanFactory`를 상속받은 Context
+- `IoC Container`라고도 한다(Ioc Container가 ApplicationContext를 구현한 객체)
+- 서로 다른 Servlet에서 공통적으로 사용할 수 있는 Bean들을 생성한다
+- **ApplicationContext에 정의된 Bean들은 ServletContext에 정의된 Bean을 사용할 수 없다**
+
+### Servlet Context
+
+- Servlet(request -> 처리 -> response 일련의 과정) 단위로 생성되는 Context
+- URL 설정이 있는 Bean들을 생성한다(@Controller, Interceptor)
+- ApplicationContext를 자신의 부모로 사용한다
+- ApplicationContext와 ServletContext에 동일한 Id로 선언된 Bean이 있다면 ServletContext에 있는걸 사용
+- Bean 찾는 순서
+  - Servlet Context에서 우선 찾고
+  - 없으면 Application Context에서 찾는다
+- **Servlet Context에 등록된 Bean은 Application Context의 Bean을 사용할 수 있다**
+
+
 
 ## Bean
 
@@ -284,28 +305,6 @@ public class Controller {
   - ServletContext 생명주기 안에 한 개의 Bean 지정
   - URL 설정이 있는 Bean들을 생성(@Controller, Interceptor)
 
-  
-
-## Application Context, Servlet Context
-
-### Application Context
-
-- `Web Application` 최상단에 위치하고 있는 `Context`
-- `Spring Container`중 하나이며 `BeanFactory`를 상속받은 Context
-- `IoC Container`라고도 한다(Ioc Container가 ApplicationContext를 구현한 객체)
-- 서로 다른 Servlet에서 공통적으로 사용할 수 있는 Bean들을 생성한다
-- **ApplicationContext에 정의된 Bean들은 ServletContext에 정의된 Bean을 사용할 수 없다**
-
-### Servlet Context
-
-- Servlet(request -> 처리 -> response 일련의 과정) 단위로 생성되는 Context
-- URL 설정이 있는 Bean들을 생성한다(@Controller, Interceptor)
-- ApplicationContext를 자신의 부모로 사용한다
-- ApplicationContext와 ServletContext에 동일한 Id로 선언된 Bean이 있다면 ServletContext에 있는걸 사용
-- Bean 찾는 순서
-  - Servlet Context에서 우선 찾고
-  - 없으면 Application Context에서 찾는다
-- **Servlet Context에 등록된 Bean은 Application Context의 Bean을 사용할 수 있다**
 
 
 
@@ -565,6 +564,8 @@ public class Controller {
 5. Servlet 종료 시 Distroy
 
 
+
+<img src="https://user-images.githubusercontent.com/41468004/140912981-20a6b974-339f-4ad6-a957-733f6a0f0487.png" style="zoom:50%;" />
 
 ### Filter의 특징
 
@@ -850,9 +851,71 @@ public class UserController {
 
 ## 토큰 기반 vs 서버(세션) 기반 인증
 
+### 서버(세션) 기반 인증
+
+- 상태를 유지해야하기에 Stateful Server 라고도 한다
+- 서버 측에서 사용자들의 정보를 기억
+- 사용자들의 정보를 기억하기 위해서 세션을 유지
+  - 메모리, 디스크, 데이터베이스를 통해 관리
+
+<img src="https://user-images.githubusercontent.com/41468004/140872677-8a1b6eac-e79d-4847-bfb9-68ff1d47ffb2.png" style="zoom:50%;" />
+
+- 로그인 중인 사용자가 늘어날 경우 서버 RAM에 부하가 걸린다
+  - 이를 회피하기 위해 DB에 저장하기도 하는데 DB 부하 또한 피하기 쉽지 않다
+- 분산 서버의 경우 세션 또한 모든 서버에서 공유 및 분산처리 => 매우 어렵고 복잡
+- CORS 오류 회피 어려움
+  - 하나의 origin에 대해 하나의 쿠키만 사용 가능
+  - 분산 서버로 나누게 되면 CORS에 필요한 쿠키도 복잡하게 관리
+
+### 토큰 기반 인증
+
+- 인증받은 사용자들에게 토큰을 발급
+- 사용자들은 토큰을 가지고 접근 => 이를 통해 유효성 검사
+- 사용자의 상태를 저장할 필요가 없으므로 Stateless Server
+
+<img src="https://user-images.githubusercontent.com/41468004/140873088-d5f16296-8e5c-40eb-ada9-1c515df0f81f.png" style="zoom:50%;" />
+
+- Stateless하기에 서버는 클라이언트와 분리 => 확장성이 좋다
+  - 분산 서버 + 토큰의 경우 세션과는 달리 어떤 서버로 요청을 보내도 괜찮다
+- 클라이언트 측의 쿠키를 보내지 않기에 보안 취약점이 덜하다
+- CORS 에러를 해결할 수 있다
+  - 어떤 디바이스, 도메인에서도 토큰에 대한 유효성만 검증하면 됨
 
 
 
+## JWT
+
+`Json 포맷을 이용해서 사용자에 대한 속성을 저장하는 Claim 기반 Web Token`
+
+> Claim?
+>
+> - 사용자의 정보나 데이터 속성 등을 의미
+> - 클레임 토큰이란
+>   - 토큰 안에 위와 같은 정보들을 담은 토큰이라고 보면 된다
+
+### 구성
+
+- Header, Payload, Signature
+- 각 부분은 Base64로 인코딩 되어 표현
+- 또한 각 부분을 이어주기 위해 . 구분자를 사용
+
+#### Header
+
+- typ와 alg 두 가지 정보로 구성
+  - tpy : 토큰의 타입을 지정
+  - alg : 알고리즘 방식을 지정, Signature를 해싱하기 위한 알고리즘 지정
+
+#### PayLoad
+
+- 토큰에서 사용할 정보의 조각들인 클레임이 담겨있다
+
+#### Signature
+
+- 토큰을 인코딩하거나 유효성 검증을 할때 사용하는 고유한 암호화 코드
+
+
+
+## 
 
 ## 
 
@@ -868,3 +931,130 @@ public class UserController {
    1. 동일하다면 성공한 `UsernameAuthenticationToken`을 생성해서 `AuthenticationManager`에게 반환
 6. `AuthenticationManager`는 `UsernameAuthenticationToken`을 `AuthenticationFilter`로 전달
 7. `AuthenticationFilter`는 전달받은 `UsernameAuthenticationToken`을 `LoginSuccessHandler`로 전송, 토큰을 response 헤더에 추가하여 반환
+
+
+
+## @RequestParam, @RequestBody, @ModelAttribute
+
+### @RequestParam
+
+- 1개의 HTTP 요청 파라미터를 받기 위해 사용
+- 기본값이 required = true이기에 기본적으로 반드시 해당 파라미터가 전송되어야함
+- false로도 가능
+- 해당 파라미터에 대해서 defaultValue 옵션을 통해서도 설정 가능
+
+### @RequestBody
+
+- 클라이언트가 전송하는 Json 형태의 HTTP Body 내용을 Java Object로 변환해주는 역할
+- Get 메소드에 사용 불가
+- MessageConverter중 하나인 MappingJackson2HttpMessageConverter를 통해 Java 객체로 변환
+  - 개본 생성자를 통해 객체 생성
+  - Reflection을 이용해서 값을 할당
+  - 이 때문에 Setter가 필요 없다
+
+### @ModelAttribute
+
+- Multipart/form-data 형태의 HTTP Body 내용과 HTTP 파라미터들을 Setter를 통해 1 : 1로 객체에 바인딩하기 위해 사용
+- 매핑시키는 파라미터의 타입이 객체의 타입과 일치하는지 등등 다양한 검증이 추가 진행
+- Setter가 없다면 바인딩되지 않는다
+  - 값을 매핑해주는 과정이 있기 때문
+  - @RequestBody는 값의 변환이기에 Setter 불필요
+
+
+
+## @Bean, @Configuration, @Component
+
+### @Bean, @Configuration
+
+- 개발자가 직접 제어가 불가능한 외부 라이브러리, 설정을 위한 클래스를 Bean으로 등록할 때 @Bean 어노테이션 사용
+- 1개 이상의 @Bean을 재공하는 클래스의 경우 반드시 @Configuration을 명시해주어야 한다
+
+### @Component
+
+- 개발자가 직접 개발한 클래스를 Bean으로 등록하고자 하는 경우 @Component 어노테이션 활용
+
+
+
+## @Autowired 빈 탐색 전략, @Qualifier, @Primary
+
+### Bean 조회 규칙
+
+@Auowired가 등록된 Bean을 찾을 때 다음과 같음 규칙으로 조회
+
+1. 주입받고자하는 타입으로 매칭 시도
+2. 타입이 여러개면 필드, 파라미터 이름으로 매칭 시도
+
+빈의 이름이 충돌되어 빈 이름만으로는 불가능할때 @Qualifier, @Primary 사용
+
+추가로 @Autowired 말고도 @Resource 사용 가능
+
+- @Autowired : 필드의 타입을 기준으로 찾음
+- @Resource : 필드의 이름을 기준으로 찾음
+
+### @Qualifier
+
+- Bean의 이름만으로는 부족해서 추가적인 식별자를 부여해주는 방식
+- Bean의 이름이 바뀌는 것이 아니라 추가적인 별칭, 구분자를 넣어주는 것
+
+### @Primary
+
+- 여러 개의 Bean들 중에서 우선순위를 부여하는 방식
+- 만약 Primary, Qualifier 둘 다 등록되어있다면 Qualifier가 우선순위를 가진다
+
+### Bean 등록 충돌 발생
+
+- 위와 같이 처리해주지 않고 중복하여 작성한다면
+  - 자동 빈 vs 자동 빈 : 빈 이름 충돌 에러 발생
+  - 수동 빈 vs 자동 빈 : 과거에는 수동빈이 자동 빈 덮었지만 최근에는 에러 발생
+
+## ApplicationContext와 Singleton
+
+### ApplicationContext
+
+- Bean Factory를 상속받아 확장한 것
+
+#### 장점
+
+- 클라이언트는 @Configuration이 붙은 구체적인 팩토리 클래스를 알 필요가 없음
+- 종합 Ioc 서비스를 제공
+- 이를 통해 다양한 빈 검색 방법 제공 가능
+
+### Singleton
+
+- 여러 빈을 요청하더라도 매번 동일한 인스턴스를 돌려준다
+- 대규모 트래픽을 처리하기 위함
+- 빈을 싱글톤 스코프로 관리해 1개의 요청이 들어왔을 때 여러 쓰레드가 빈을 공유해 처리할 수 있도록
+
+#### Singleton 구현의 단점
+
+- private 생성자를 가지고 있어 상속 불가능
+- 테스트가 어려움
+- 멀티쓰레드 환경에서 여기저기 가져다가 쓰게되면 전역 상태가 될 수 있음
+
+#### Spring Singleton의 장점
+
+- static 메소드나 private 생성자를 사용하지 않아 객체지향적 개발 가능
+- 테스트가 용이해짐
+- 멀티쓰레드 환경에서 위험할수도 있기에 무상태로 만드는데 Spring 자체에서 Bean들을 이렇게 만들어준다
+
+## Entity or Domain Object와 DTO를 분리해야 하는 이유
+
+> 1. 관심사의 분리
+> 2. Validation 로직 및 불필요한 코드 등과의 분리
+> 3. 순환 참조 방지
+
+### 관심사 분리
+
+- DTO의 핵심 관심사는 이름 그대로 데이터 전달
+- 엔티티는 핵심 비즈니스 로직을 담는 비즈니스 도메인 영역의 일부
+
+### Validation 로직 및 불필요한 코드 등과의 분리
+
+- @Valid 사용시 관련 유효성 검증 어노테이션을 붙여야하는데 코드가 더러워진다
+- 또한 API에서 응답에 불필요한 변수들은 @JsonIgnore등을 사용해야하는데 추가적으로 코드가 복잡해짐
+
+### 순환 참조 방지
+
+- API에서 Entity 반환시 Json화시킴으로서 내부적으로 toString 호출
+- 각 내부 필드내에 양방향 참조 필드가 존재할 시 참조하는 엔티티도 조회
+- 해당 엔티티 내에서 toString발생 -> 무한반복

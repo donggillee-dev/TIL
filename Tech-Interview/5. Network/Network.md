@@ -340,11 +340,96 @@ UDP
 
   - 연결을 끊는 순간 클라와 서버의 통신은 끝나며 상태 정보를 유지하지 않는다
 
-  - 이런 단점을 해결하기 위해 Cookie Session 사용
+  - 이런 단점을 해결하기 위해 Cookie Session Cache 사용
 
+### HTTP 공통헤더
 
+1. Date
+2. Connection
+3. Content-Length
+4. Cache-Control
+5. Content-Type
+6. Content-Language
+7. Content-Encoding
 
-#### 서버와 클라의 HTTP 통신 과정
+### HTTP 요청헤더
+
+1. Host
+2. Cookie
+3. Origin
+
+### HTTP 응답헤더
+
+1. Server
+2. Access-Control-Allow-Origin
+
+### HTTP/0.9 - 원-라인 프로토콜
+
+- 단일 라인으로 구성된 요청
+- 가능한 메서드: GET
+- 단순한 응답
+- 파일 내용 자체로 구성
+
+### HTTP/1.0
+
+- 1번에 연결에 1번의 Request & 1번의 Response
+- 매번 새로운 연결로 성능 저하
+- 서버 부하 비용 증가
+
+### HTTP/1.1
+
+- TCP Connection 사용
+- HTTP 헤더 + 바디로 구성
+- HTTP Body가 사람이 읽을 수 있는 문자열 그대로 전송된다
+- Persistent Connection
+  - 지정한 Timeout 동안 커넥션을 닫지 않는 방식
+
+- Pipelining
+  - 하나의 커넥션에서 응답을 기다리지 않고 순차적인 여러 요청을 연속적으로 보내 그 순서에 맞춰 응답을 받는 방식으로 지연 시간을 줄이는 방법
+
+- Head Of Line Blocking
+  - 1개의 TCP 연결당 1개의 스트림만 이용 가능
+  - 따라서, 패킷이 순서대로 도착해야함
+  - 패킷이 도착할떄까지 그 이후의 패킷은 전송되지 못하고 있는 것
+
+- Header 구조의 중복
+
+### HTTP/2
+
+- 기존 HTTP/1.x 버전의 **성능 향상**에 초점을 맞춘 프로토콜
+
+- HTTP Body가 이진 데이터이다
+
+  - 바이너리 프레이밍 계층 사용해서 이진 데이터로 전송
+  - 파싱, 전송 속도 ↑, 오류 발생 가능성 ↓
+
+- 요청과 응답의 다중화(Multiplexing)
+
+  - 1개의 TCP연결 당 1개의 스트림만 이용 가능했던 단점을 해결
+  - 따라서 TCP연결의 3-way-handshaking 오버헤드가 없음
+  - Head Of Line Blocking 해결
+
+- Stream Prioritization
+
+  - 리소스간 우선 순위 설정 가능
+
+- Server Push
+
+  - 클라이언트에 필요한 데이터가 있을떄 직접 요청 전 서버가 미리 데이터를 전송해서 받아볼 수 있게끔 함
+
+  [![image](https://user-images.githubusercontent.com/55429912/123412063-1ff3c680-d5ec-11eb-9893-9c9d5adfbe54.png)](https://user-images.githubusercontent.com/55429912/123412063-1ff3c680-d5ec-11eb-9893-9c9d5adfbe54.png)
+
+- Header Compression
+
+  <img src="https://user-images.githubusercontent.com/41468004/141018607-2788f29f-78b1-4b0d-b2e6-fd2dd68804d7.png" alt="image" style="zoom:50%;" />
+
+  - HPACK 압축을 통해서 헤더를 압축
+    - 왜 HPACK?
+    - 기존 GZIP은 정보가 노출될 수 있는 단점이 존재
+    - 첫번쨰 요청과 두번쨰 요청의 차이나는 바이트 수만 전송하는 방식
+  - 헤더의 크기를 줄여 페이지 로드 시간 감소
+
+### 서버와 클라의 HTTP 통신 과정
 
 1. 사용자가 브라우저에 URL 입력
 2. DNS 서버에 웹 서버의 호스트 이름을 IP주소로 변경 요청

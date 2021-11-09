@@ -372,6 +372,14 @@ DBMS는 인덱스를 어떻게 관리하나?
 
 ### 클러스터링(Clustering)
 
+#### 동작 과정
+
+- 1개의 노드에 쓰기 트랜잭션이 수행, COMMIT을 수행
+- 실제 디스크에 쓰기 전에 다른 분산 노드들에게 동일하게 복제를 요청
+- 다른 노드에서 복제 요청을 받고 각각 디스크에 동기적으로 데이터를 저장
+  - 이런 동기적인 방법으로 인해 데이터의 무결성을 보장
+  - 다만, Replication 방식에 비해 성능이 떨어진다
+
 #### Active-Active 클러스터링
 
 <img src="https://user-images.githubusercontent.com/41468004/140709901-6e868d21-dc90-4251-9317-0836e48b04cc.png" alt="image" style="zoom: 67%;" />
@@ -400,15 +408,30 @@ DBMS는 인덱스를 어떻게 관리하나?
 - Fail Over가 이루어지는 수초~수분 간의 시간동안 영엽 손실 필연적 발생
 - 하나뿐인 스토리지에 오류가 발생하면 데이터 복구는 어떻게...?
 
-### 레플리케이션(Reflication)
+#### Shared Disk
 
-<img src="https://user-images.githubusercontent.com/41468004/140711617-723fedf0-59d6-4fca-b268-296e7248b817.png" alt="image" style="zoom: 67%;" />
+- 위의 스토리지 하나 여러대의 DB 서버의 방식
+- 병목현상 발생 가능하기도 하고 각 서버간의 정보 공유를 위한 오버헤드도 크다
 
-- 사용자가 Master DB에 DML(Select/Insert/Update/Delete)를 하면 Master DB는 Slave DB에 데이터 복제
+#### Shared Nothing
+
+- 아무것도 공유하지 않는다는 것, 즉 자원을 분리
+- Active Stand-By에서 저장소 하나만 있을때 해당 스토리지에 오류가 발생하게 될 경우를 방지하기 위한 방법
+- 하지만 지속적으로 모든 저장소에 대해 데이터 무결성, 동기화를 동기적으로 해야하기에 구조가 복잡하다
+
+### 레플리케이션(Replication)
+
+<img src="https://user-images.githubusercontent.com/41468004/140864459-5009c49f-848b-4e5c-9d32-455687f93631.png" alt="image" style="zoom: 67%;" />
+
+- Master 노드에 쓰기 트랜잭션이 수행
+- Master 노드는 데이터를 저장하고 트랜잭션에 대한 로그를 파일에 기록(BIN LOG)
+- Slave 노드의 I/O Thread는 Master노드의 BIN LOG를 Relay Log에 복사
+- Slave 노드의 SQL Thread는 Relay Log를 한 줄씩 읽으며 데이터를 저장
 
 장점
 
 - 이를 통해 스토리지가 1개 였을때의 데이터 손실을 방지할 수 있음
+- 비동기 방식으로 운영되어 지연 시간이 거의 없다
 
 단점
 
@@ -418,6 +441,8 @@ DBMS는 인덱스를 어떻게 관리하나?
 - 특정 테이블에 데이터가 엄청 많다면?
   - Slave DB를 여러대 두더라도 특정 값을 찾기 위해서는 동일하게 오랜 시간이 걸린다
   - 이를 해결하기 위한게 `샤딩`
+- 노드들 간의 데이터 동기화가 보장되지 않는다(데이터 무결성 검사 x) -> 일관성있는 데이터를 얻지 못하게 될 수 있다
+- Master 노드가 죽게될 경우 장애 대처, 복구가 복잡하다
 
 ### 샤딩(Sharding)
 
