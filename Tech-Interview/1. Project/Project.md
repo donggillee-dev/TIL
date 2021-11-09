@@ -9,6 +9,8 @@
   - 하지만 서버의 자원은 제한되어 있으므로 일정 수 이상의 Thread는 발생시킬 수 없음
   - 그래서 서버 업그레이드 or Load-Balancing
 
+<img src="https://user-images.githubusercontent.com/41468004/141021923-6469daa1-014b-4cd0-968a-4255abdaf725.png" alt="image"  />
+
 ### 이벤트 루프
 
 - 클라이언트의 요청을 비동기로 처리하기 위해 이벤트 발생 -> 서버 내부에 메시지 형태로 전달
