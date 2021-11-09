@@ -845,3 +845,26 @@ public class UserController {
 - 보통 비즈니스 로직을 담고 있는 서비스 계층의 메소드와 결합
   - 일반적으로 데이터를 읽어오고 사용하고 변경하고 등의 작업을 하는 곳이 대부분 Service Layer이기 때문
   - 서비스 클래스의 상단에 @Transactional해주면 그 안의 모든 메소드가 트랜잭션 관리 대상이 된다
+
+
+
+## 토큰 기반 vs 서버(세션) 기반 인증
+
+
+
+
+
+## 
+
+## Spring Security 처리 과정
+
+<img src="https://user-images.githubusercontent.com/41468004/140858354-29f042df-e7a8-4012-8ac8-05c8aacde4ad.png" style="zoom:50%;" />
+
+1. Client가 ID, PW로 로그인 요청
+2. `AuthenticationFilter`에서 `UserNamePasswordAuthenticationToken`을 생성해서 `AuthenticationManager`로 전달
+3. `AuthenticationManager`는 등록된 `AuthenticationProvider`들을 조회해서 인증을 요청한다
+4. 인증 요청을 받은 `AuthenticationProvider`는 `UserDetailService`를 통해 입력받은 ID에 대한 User의 정보를 DB에서 조회한다
+5. 사용자가 입력한 PW를 암호화하여 조회한 User의 PW와 동일한 것인지 확인
+   1. 동일하다면 성공한 `UsernameAuthenticationToken`을 생성해서 `AuthenticationManager`에게 반환
+6. `AuthenticationManager`는 `UsernameAuthenticationToken`을 `AuthenticationFilter`로 전달
+7. `AuthenticationFilter`는 전달받은 `UsernameAuthenticationToken`을 `LoginSuccessHandler`로 전송, 토큰을 response 헤더에 추가하여 반환

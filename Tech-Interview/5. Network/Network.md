@@ -793,3 +793,60 @@ IO 진행시간과 관계가 없기에 작업을 중지하지 않고도 IO 가�
 
 - WAS는 DB 조회나 비즈니스 로직 처리 등 복잡한 행동을 많이 한다 그렇기에 단순히 전달만 하면되는 정적인 콘텐츠들은 Web Server에게 일임
 - 이로써 부하를 방지해 수행 속도를 향상시킴
+
+## CORS
+
+`CORS? => 교차 출처 리소스 공유, 브라우저에서 다른 출처의 리소스를 공유하는 방법`
+
+### URL 구조
+
+<img src="https://user-images.githubusercontent.com/41468004/140862435-1e3e3db9-60ec-4b0a-af1c-93380a0348d5.png" style="zoom:50%;" />
+
+- 다른 출처의 리소스란 무엇인지 알기 위해 URL 구조부터 파악해보자
+- 여기서 같은 출처란? 
+  - Protocol, Host, Port가 동일해야 같은 출처이다
+
+### 동일 출처 정책(Same-Origin Policy)이란?
+
+- 브라우저가 동일 출처 정책을 지켜서 다른 출처의 리소스 접근을 금지하는 행위
+- `giri.github.io`라는 도메인 주소를 사용하는 웹페이지에서 `giri-api.github.io`라는 API 서버로 데이터를 요청한다면 정책을 위반하는 것
+
+장점
+
+- 외부 리소스를 가져오지 못하지만 XSS, XSRF와 같은 보안 취약점을 노린 공격을 방어할 수 있음
+- 이때 외부 리소스를 가져오기 위한 예외 조항이 CORS
+
+### CORS 동작 원리
+
+- 단순 요청 방법, 예비 요청을 보내는 방법 두가지가 존재
+
+### Simple Request
+
+말 그대로 서버에게 바로 요청을 보내는 방법
+
+<img src="https://user-images.githubusercontent.com/41468004/140863015-7ca47d15-bb19-4897-8ee3-6d8af0396fa7.png" style="zoom:50%;" />
+
+- 서버에 API를 요청하고 서버는 Access-Control-Allow-Origin 헤더를 포함한 응답을 브라우저에 보내준다
+- 브라우저는 Access-Control-Allow-Origin 헤더를 확인해서 CORS 동작을 수행할지 판단
+
+#### Simple Request 조건
+
+- 3가지 조건을 만족시켜야 서버로 전달하는 요청이 단순 요청으로 동작
+  - 요청 메서드는 GET, HEAD, POST 중 하나
+  - Accept, Accept-Language, Content-Language, Content-Type, DPR, Downlink, Save-Data, Viewport-Width, Width를 제외한 헤더를 사용하면 안된다
+  - Content-Type 헤더는 application/x-www-form-urlencoded, multipart/form-data, text/plain 중 하나만 사용
+- 2, 3번 조건이 매우 까다롭다 인증 헤더인 Authrization 헤더가 포함되지 않는다
+
+### Preflight Request
+
+서버에 예비 요청을 보내 안전한지 확인 -> 요청을 보냄
+
+<img src="https://user-images.githubusercontent.com/41468004/140863470-efc4ad7a-3028-4297-afb5-c2a8dcd3b92b.png" style="zoom:50%;" />
+
+- OPTIONS 메서드를 통해 실제 요청을 전송할지 판단
+- OPTIONS 메서드로 서버에 예비 요청 보내고 서버는 이 예비 요청에 대한 응답으로 Access-Control-Allow-Origin 헤더를 포함한 응답을 보내준다
+
+### CORS 에러 해결 방법
+
+- Access-Control-Allow-Origin 헤더를 포함시켜 브라우저에게 응답을 보내는 방식으로 해결 가능
+- 여러 프레임워크에서는 CORS를 해결해주는 라이브러리를 별도로 제공한다
