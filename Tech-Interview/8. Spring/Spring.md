@@ -1058,3 +1058,28 @@ public class UserController {
 - API에서 Entity 반환시 Json화시킴으로서 내부적으로 toString 호출
 - 각 내부 필드내에 양방향 참조 필드가 존재할 시 참조하는 엔티티도 조회
 - 해당 엔티티 내에서 toString발생 -> 무한반복
+
+## @Component, @Controller, @Service, @Repository 차이
+
+> @Controller, @Service, @Repository 모두 @Component가 붙어있다
+>
+> 스프링에서는 컴포넌트 스캔을 통해 @Component가 붙어있는 클래스들을 스캔해서 빈으로 등록
+>
+> 즉 위 4가지들도 스캔해서 빈으로 등록
+>
+> 어노테이션은 상속을 지원하지 않기에 이런 처리는 자바가 아니라 스프링이 하는것
+
+### @Controller
+
+- 해당 클래스를 스프링 MVC 모듈의 컨트롤러로 인식하게 처리
+
+### @Service
+
+- 특별한 처리를 해주는 것은 아님
+- 하지만 개발자들에게 비즈니스 로직임을 명시적으로 보여줌
+
+### @Repository
+
+- 해당 클래스를 스프링 Data Access Layer로 인식하게끔
+- Data Layer의 예외를 스프링 예외로 변환 => DataAccessException
+- 이를 통해 db마다 다른 예외가 발생하여도 서비스 레이어에 영향을 끼치지 않음
