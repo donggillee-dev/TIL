@@ -91,9 +91,11 @@ async function logItems() {
 #### New Space & Old Space
 
 - New Space는 새로운 할당이 일어나는 곳
-- GC가 자주 일어나는 곳
+  - GC가 자주 일어나는 곳
+
 - Old Space는 New Space에서 살아남은 애들이 존재한다
-- Old Space에서의 GC는 비용이 비싸기에 자주 일어나지 않는다
+  - Old Space에서의 GC는 비용이 비싸기에 자주 일어나지 않는다
+
 
 
 
@@ -215,7 +217,7 @@ async function logItems() {
 - 이미지는 컨테이너를 실행하기 위한 모든 정보를 가지고 있음 그래서 의존성 파일 설치 후 별도의 설치가 필요 없음
   - 새로운 서버 추가되면 미리 만들어져있는 이미지를 다운받고 컨테이너를 생성하면 된다
 
-### 레이저 저장방식
+### 레이어 저장방식
 
 ![](https://user-images.githubusercontent.com/55429912/121001380-31546a80-c7c6-11eb-8337-63567cf30c10.png)
 

@@ -11,8 +11,6 @@
 
 ## DP를 이용한 LIS
 
-## 
-
 ```java
 int[] arr = {7 ,2 ,3, 8, 4, 5};
 int[] dp = new int[arr.length];

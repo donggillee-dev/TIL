@@ -115,22 +115,22 @@ private static int[] makeTable(char[] pattern) {
 
   for(int i = 1; i < patternSize; i++) {
     while(j > 0 && pattern[j] != pattern[i]) {
-      j = result[j - 1];
+      j = pi[j - 1];
     }
     if(pattern[j] == pattern[i]) {
-      result[i] = ++j;
+      pi[i] = ++j;
     }
   }
 
   return pi;
 }
 
-private static boolean KMP(char[] parent, char[] pattern, int[] table, StringBuilder sb) {
+private static boolean KMP(char[] parent, char[] pattern, int[] pi, StringBuilder sb) {
   int j = 0, parentSize = parent.length, patternSize = pattern.length;
 
   for(int i = 0; i < parentSize; i++) {
     while(j > 0 && pattern[j] != parent[i]) {
-      j = table[j - 1];
+      j = pi[j - 1];
     }
     if(pattern[j] == parent[i]) {
       if(j == patternSize - 1) {

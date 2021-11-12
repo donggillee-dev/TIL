@@ -23,7 +23,7 @@
 
 ## 컴파일 과정
 
-![](https://user-images.githubusercontent.com/41468004/137432755-fbb71da4-2927-4159-b713-c9a18cce2481.png)
+<img src="https://user-images.githubusercontent.com/41468004/137432755-fbb71da4-2927-4159-b713-c9a18cce2481.png" style="zoom:50%;" />
 
 1. 개발자가 Java 코드를 작성
 2. 자바 컴파일러(Java Compiler)가 자바 소스파일(.java)을 컴파일함
@@ -176,7 +176,7 @@
 
   - Eden : 객체들이 최초로 생성되는 공간
   - Survivor 0 / 1
-    - Eden  영역이 가차면, Minor GC가 발생하는데 여기서 살아남은 애들을 넣어 놓는 곳
+    - Eden  영역이 차면, Minor GC가 발생하는데 여기서 살아남은 애들을 넣어 놓는 곳
     - Minor GC는 Survivor 영역도 체크해서 살아남은 애들 다 한쪽으로 몰아넣는다 그래서 Survivor 영역 두개 중 하나는 꼭 비어있다
       
 
@@ -197,7 +197,7 @@
 
 - GC(Garbage-Collection)을 실행하기 위해 JVM이 어플리케이션 실행을 멈추는 것
 - GC를 수행하는 쓰레드를 제외한 나머지 쓰레드 모두 작업을 멈춤
-- 어떤 GC를 사용하더라도 Stop-The-World는 발생하므로 **GC 튜닝이랑 이 Stop-The-World 시간을 줄이는 것**
+- 어떤 GC를 사용하더라도 Stop-The-World는 발생하므로 **GC 튜닝이란 이 Stop-The-World 시간을 줄이는 것**
 
 
 
@@ -1100,7 +1100,7 @@ public class Main {
 
 - abstarct 키워드로 선언된 클래스
 
-- 추상 메서드를 최송 하나 이상 가지고 abstract로 선언된 클래스
+- 추상 메서드를 최소 하나 이상 가지고 abstract로 선언된 클래스
 - 추상 메서드가 없어도 abstract로 선언한 클래스
 
 #### 추상 클래스의 구현
@@ -1118,7 +1118,7 @@ public class Main {
 
 #### 개념
 
-- 추상 메서드와 상수만을 포함, interface 키워드를 사용하여 선언한다 
+- 추상 메서드와 상수만을 포함, interface 키워드를 사용하여 선언한다
 
 #### 인터페이스의 구현
 

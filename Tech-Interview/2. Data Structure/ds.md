@@ -280,12 +280,17 @@ LinkedList
 이진탐색 트리의 순회는 `중위 순회(in-order)`로 정렬된 순서를 읽을 수 있다.
 
 ```java
-public void inorder(Node p) {
+public int inorder(int target, Node p) {
 	if(p != null) {
-    inorder(p.leftChild);
-    System.out.println(p.elem);
-    inorder(p.rightChild);
+    if(p.value == target) return target;
+    if(p.value < target) {
+      return inorder(target, p.rightChild);
+    } else {
+      return inorder(target, p.leftChild);
+    }
   }
+  
+  return -1;
 }
 ```
 
