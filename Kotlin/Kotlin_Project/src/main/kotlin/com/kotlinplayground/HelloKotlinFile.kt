@@ -17,4 +17,9 @@ fun main() {
             if(j == 2) continue@loop
         }
     }
+
+    println(a(1, 2))
 }
+var test = 10;
+
+fun a(x: Int, y: Int) : Unit {}
