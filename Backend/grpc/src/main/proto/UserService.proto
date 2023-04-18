@@ -1,0 +1,20 @@
+// UserService.proto
+syntax = "proto3";
+package grpc;
+option java_multiple_files = true;
+option java_package = "com.lattechiffon.grpc";
+option java_outer_classname = "UserServiceOuterClass";
+
+service UserService {
+  rpc setUser(User) returns (UserIdx); // 새로운 사용자를 등록하는 Unary RPC 메서드
+  rpc getUser(UserIdx) returns (User); // 등록된 사용자를 조회하는 Unary RPC 메서드
+}
+message User {
+  int64 idx = 1;
+  string username = 2;
+  string email = 3;
+  repeated string roles = 4;
+}
+message UserIdx {
+  int64 idx = 1;
+}
